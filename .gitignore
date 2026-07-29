@@ -1,0 +1,31 @@
+# Laravel / PHP
+backend/vendor/
+backend/.env
+backend/.env.backup
+backend/.phpunit.result.cache
+backend/storage/framework/cache/data/
+backend/storage/framework/sessions/
+backend/storage/framework/testing/
+backend/storage/framework/views/
+backend/storage/logs/
+backend/storage/app/public/
+backend/database/database.sqlite
+backend/database/database.sqlite-journal
+
+# Next.js / Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnp.*
+frontend/.pnpm-debug.log*
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+*.log
