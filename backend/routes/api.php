@@ -24,10 +24,7 @@ Route::get('/running-text', [SettingController::class, 'getRunningText']);
 Route::get('/umkm', [UmkmController::class, 'index']);
 Route::get('/bansos', [BansosController::class, 'index']);
 Route::post('/bansos/cek', [BansosController::class, 'cekPenerima']);
-Route::get('/penduduk', [PendudukController::class, 'index']);
 Route::get('/statistik', [PendudukController::class, 'statistik']);
-Route::get('/keluarga', [KeluargaController::class, 'index']);
-Route::get('/keluarga/{id}', [KeluargaController::class, 'show']);
 Route::get('/posyandu', [\App\Http\Controllers\PosyanduController::class, 'index']);
 Route::get('/forum', [\App\Http\Controllers\ForumTopicController::class, 'index']);
 Route::get('/forum/{id}', [\App\Http\Controllers\ForumTopicController::class, 'show']);
@@ -143,11 +140,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/berita/{id}', [BeritaController::class, 'destroy']);
 
         // Kelola Penduduk
+        Route::get('/penduduk', [PendudukController::class, 'index']);
         Route::post('/penduduk', [PendudukController::class, 'store']);
         Route::put('/penduduk/{id}', [PendudukController::class, 'update']);
         Route::delete('/penduduk/{id}', [PendudukController::class, 'destroy']);
 
         // Kelola Keluarga
+        Route::get('/keluarga', [KeluargaController::class, 'index']);
+        Route::get('/keluarga/{id}', [KeluargaController::class, 'show']);
         Route::post('/keluarga/import', [KeluargaController::class, 'import']);
         Route::post('/keluarga', [KeluargaController::class, 'store']);
         Route::put('/keluarga/{id}', [KeluargaController::class, 'update']);
