@@ -111,8 +111,10 @@ export default function ForumPage() {
             topics.map(topic => (
               <div key={topic.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl font-bold text-gray-900 cursor-pointer hover:text-primary transition-colors">
-                    {topic.judul}
+                  <h3
+                    onClick={() => router.push(`/forum/${topic.id}`)}
+                    className="text-xl font-bold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                  >                    {topic.judul}
                   </h3>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${topic.status === 'Open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                     {topic.status}

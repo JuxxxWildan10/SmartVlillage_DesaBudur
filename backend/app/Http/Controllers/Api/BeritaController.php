@@ -17,6 +17,22 @@ class BeritaController extends Controller
         ]);
     }
 
+    /**
+     * Get detail satu berita by ID (Public)
+     */
+    public function show($id)
+    {
+        $berita = Berita::find($id);
+        if (!$berita) {
+            return response()->json(['status' => 'error', 'message' => 'Berita tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $berita
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -25,7 +41,7 @@ class BeritaController extends Controller
             'isi_berita' => 'required',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('gambar_url_file');
         if ($request->hasFile('gambar_url')) {
             $path = $request->file('gambar_url')->store('berita', 'public');
             $data['gambar_url'] = '/api/berita/image/' . basename($path);
@@ -44,7 +60,7 @@ class BeritaController extends Controller
         $berita = Berita::find($id);
         if (!$berita) return response()->json(['status' => 'error'], 404);
 
-        $data = $request->all();
+        $data = $request->except('gambar_url_file');
         if ($request->hasFile('gambar_url')) {
             $path = $request->file('gambar_url')->store('berita', 'public');
             $data['gambar_url'] = '/api/berita/image/' . basename($path);

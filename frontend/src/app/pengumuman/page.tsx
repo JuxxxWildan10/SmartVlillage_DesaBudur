@@ -63,7 +63,7 @@ export default function PengumumanPage() {
                   {item.isi_berita}
                 </p>
                 
-                <Link href={`#`} className="inline-flex items-center gap-2 text-gold-dark font-bold text-sm hover:text-gold transition-colors">
+                <Link href={`/pengumuman/${item.id}`} className="inline-flex items-center gap-2 text-gold-dark font-bold text-sm hover:text-gold transition-colors">
                   Baca Selengkapnya <ArrowRight size={16} />
                 </Link>
               </div>

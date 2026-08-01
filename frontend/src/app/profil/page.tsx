@@ -1,8 +1,28 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import Navbar from "@/components/layout/Navbar";
+import axios from "axios";
 import { Users, History, Target, ShieldCheck } from "lucide-react";
 
+
 export default function ProfilDesa() {
+  const [aparaturList, setAparaturList] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/aparatur`)
+      .then(res => {
+        if (res.data.status === 'success') setAparaturList(res.data.data);
+      })
+      .catch(() => {
+        // Fallback: gunakan data placeholder agar halaman tetap tampil
+        setAparaturList([
+          { id: 1, nama_lengkap: 'Sandar Wiguna, S.E.', jabatan: 'Kuwu (Kepala Desa)', foto: null },
+          { id: 2, nama_lengkap: 'Budi Santoso', jabatan: 'Sekretaris Desa', foto: null },
+        ]);
+      });
+  }, []);
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="bg-primary pt-32 pb-20 px-4 relative overflow-hidden">
@@ -82,24 +102,31 @@ export default function ProfilDesa() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { nama: "Sandar Wiguna, S.E.", jabatan: "Kuwu (Kepala Desa)" },
-            { nama: "Budi Santoso", jabatan: "Sekretaris Desa" },
-            { nama: "Siti Aminah", jabatan: "Kaur Keuangan" },
-            { nama: "Ahmad Yani", jabatan: "Kaur Perencanaan" },
-            { nama: "Joko Anwar", jabatan: "Kasi Pemerintahan" },
-            { nama: "Rini Wulandari", jabatan: "Kasi Kesejahteraan" },
-            { nama: "Sholeh", jabatan: "Kasi Pelayanan" },
-            { nama: "Hasanudin", jabatan: "Kepala Dusun I" },
-          ].map((person, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-2xl text-center shadow-sm border border-gray-100 hover:-translate-y-2 transition-transform">
-              <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${person.nama}`} alt={person.nama} className="w-full h-full object-cover bg-gray-100" />
+          {aparaturList.length === 0 ? (
+            [...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white p-6 rounded-2xl text-center shadow-sm border border-gray-100 animate-pulse">
+                <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4" />
+                <div className="h-4 bg-gray-200 rounded mx-auto w-3/4 mb-2" />
+                <div className="h-3 bg-gray-100 rounded mx-auto w-1/2" />
               </div>
-              <h4 className="font-bold text-gray-900">{person.nama}</h4>
-              <p className="text-sm text-primary font-medium">{person.jabatan}</p>
-            </div>
-          ))}
+            ))
+          ) : (
+            aparaturList.map((person: any, idx: number) => (
+              <div key={person.id || idx} className="bg-white p-6 rounded-2xl text-center shadow-sm border border-gray-100 hover:-translate-y-2 transition-transform">
+                <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
+                  <img
+                    src={person.foto
+                      ? `${process.env.NEXT_PUBLIC_BASE_URL}${person.foto}`
+                      : `https://api.dicebear.com/7.x/avataaars/svg?seed=${person.nama_lengkap}`}
+                    alt={person.nama_lengkap}
+                    className="w-full h-full object-cover bg-gray-100"
+                  />
+                </div>
+                <h4 className="font-bold text-gray-900">{person.nama_lengkap}</h4>
+                <p className="text-sm text-primary font-medium">{person.jabatan}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </main>

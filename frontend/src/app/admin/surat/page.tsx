@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
-import { Check, X, Clock, FileText, MessageCircle, Search, Trash2 } from "lucide-react";
+import { Check, X, Clock, FileText, MessageCircle, Search, Trash2, FileCheck } from "lucide-react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import SkeletonTable from "@/components/shared/SkeletonTable";
@@ -89,16 +89,18 @@ export default function AdminSurat() {
 
   const notifyWhatsApp = (surat: any) => {
     if (!surat.nomor_wa) {
-      alert("Warga ini tidak mencantumkan nomor WhatsApp.");
+      toast.error("Warga ini tidak mencantumkan nomor WhatsApp.");
       return;
     }
     let phone = surat.nomor_wa;
     if (phone.startsWith("0")) {
       phone = "62" + phone.slice(1);
     }
-    const message = `*Pemdes Budur*\nHalo, permohonan surat Anda dengan Jenis: *${surat.jenis_surat}* (Tracking: ${surat.tracking_code}) telah *DISETUJUI*.\n\nSilakan datang ke Balai Desa Budur pada jam kerja untuk mengambil berkas fisik Anda. Terima kasih.`;
+    const pdfLink = `${process.env.NEXT_PUBLIC_API_URL}/surat/${surat.tracking_code}/pdf`;
+    const namaWarga = surat.penduduk?.nama_lengkap || "Warga";
+    const message = `*Pemerintah Desa Budur* ✅\n\nYth. ${namaWarga},\n\nPermohonan *${surat.jenis_surat}* Anda dengan kode tracking *${surat.tracking_code}* telah *DISETUJUI* dan siap diunduh.\n\n📄 *Unduh Dokumen Surat (PDF):*\n${pdfLink}\n\nTerima kasih telah menggunakan layanan digital Desa Budur.`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   return (
@@ -126,8 +128,8 @@ export default function AdminSurat() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                <th className="px-6 py-4">ID</th>
-                <th className="px-6 py-4">Penduduk ID</th>
+                <th className="px-6 py-4">Kode</th>
+                <th className="px-6 py-4">Nama Pemohon</th>
                 <th className="px-6 py-4">Jenis Surat</th>
                 <th className="px-6 py-4">Keperluan</th>
                 <th className="px-6 py-4">Status</th>
@@ -143,8 +145,11 @@ export default function AdminSurat() {
               ) : (
                 filteredSurat.map((surat) => (
                   <tr key={surat.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">#{surat.id}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{surat.penduduk_id}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-gray-500">{surat.tracking_code || `#${surat.id}`}</td>
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-gray-900">{surat.penduduk?.nama_lengkap || "—"}</p>
+                      <p className="text-xs text-gray-400">{surat.penduduk?.nik}</p>
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-700">{surat.jenis_surat}</td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={surat.keperluan}>{surat.keperluan}</td>
                     <td className="px-6 py-4">

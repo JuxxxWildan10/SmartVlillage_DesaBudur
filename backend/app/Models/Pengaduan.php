@@ -8,4 +8,9 @@ class Pengaduan extends Model
 {
     protected $table = 'pengaduan';
     protected $guarded = [];
+
+    public function penduduk()
+    {
+        return $this->belongsTo(Penduduk::class, 'penduduk_id');
+    }
 }

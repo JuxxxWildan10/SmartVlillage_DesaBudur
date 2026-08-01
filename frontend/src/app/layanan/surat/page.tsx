@@ -12,7 +12,10 @@ export default function SuratPage() {
   const [formData, setFormData] = useState({ jenis_surat: "", keperluan: "", nomor_wa: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [trackingCode, setTrackingCode] = useState("");
-  
+
+  // Jenis surat dari database
+  const [jenisSuratList, setJenisSuratList] = useState<any[]>([]);
+
   // Tracking state
   const [trackInput, setTrackInput] = useState("");
   const [trackResult, setTrackResult] = useState<any>(null);
@@ -24,9 +27,23 @@ export default function SuratPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
-    if (token) {
-      setIsAuth(true);
-    }
+    if (token) setIsAuth(true);
+
+    // Fetch jenis surat dari database
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/master-surat`)
+      .then(res => {
+        if (res.data.status === "success") setJenisSuratList(res.data.data);
+      })
+      .catch(() => {
+        // Fallback jika API gagal
+        setJenisSuratList([
+          { id: 1, nama_surat: "Surat Keterangan Usaha (SKU)" },
+          { id: 2, nama_surat: "Surat Keterangan Tidak Mampu (SKTM)" },
+          { id: 3, nama_surat: "Surat Keterangan Domisili" },
+          { id: 4, nama_surat: "Surat Pengantar Nikah" },
+          { id: 5, nama_surat: "Surat Keterangan Kematian" },
+        ]);
+      });
   }, []);
 
   const handleTabSwitch = (tab: "lacak" | "pengajuan") => {
@@ -43,9 +60,7 @@ export default function SuratPage() {
       router.push("/auth/login?redirect=/layanan/surat");
       return;
     }
-    
     setStatus("loading");
-    
     try {
       const res = await api.post("/surat", formData);
       if (res.data.status === "success") {
@@ -64,17 +79,12 @@ export default function SuratPage() {
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackInput.trim()) return;
-
     setTrackLoading(true);
     setTrackError("");
     setTrackResult(null);
-
     try {
-      // Public API using standard axios (no auth required)
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/surat/track/${trackInput}`);
-      if (res.data.status === "success") {
-        setTrackResult(res.data.data);
-      }
+      if (res.data.status === "success") setTrackResult(res.data.data);
     } catch (err: any) {
       setTrackError(err.response?.data?.message || "Terjadi kesalahan saat melacak surat.");
     } finally {
@@ -84,13 +94,16 @@ export default function SuratPage() {
 
   const getStatusIcon = (st: string) => {
     switch(st) {
-      case 'Menunggu': return <Clock className="text-yellow-500" size={24} />;
-      case 'Diproses': return <FileText className="text-blue-500" size={24} />;
-      case 'Selesai': return <FileCheck className="text-green-500" size={24} />;
-      case 'Ditolak': return <FileX className="text-red-500" size={24} />;
-      default: return <Clock className="text-gray-500" size={24} />;
+      case "Menunggu": return <Clock className="text-yellow-500" size={24} />;
+      case "Diproses": return <FileText className="text-blue-500" size={24} />;
+      case "Selesai":  return <FileCheck className="text-green-500" size={24} />;
+      case "Ditolak":  return <FileX className="text-red-500" size={24} />;
+      default:         return <Clock className="text-gray-500" size={24} />;
     }
   };
+
+  // Ambil info persyaratan jenis surat yang dipilih
+  const selectedJenis = jenisSuratList.find(j => j.nama_surat === formData.jenis_surat);
 
   return (
     <div className="pt-24 pb-16 min-h-screen bg-gray-50">
@@ -110,21 +123,21 @@ export default function SuratPage() {
 
         {/* Tabs */}
         <div className="flex bg-white rounded-2xl p-2 shadow-sm mb-8 border border-gray-100">
-          <button 
+          <button
             onClick={() => handleTabSwitch("pengajuan")}
-            className={`flex-1 py-3 text-center rounded-xl font-bold transition-all ${activeTab === 'pengajuan' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            className={`flex-1 py-3 text-center rounded-xl font-bold transition-all ${activeTab === "pengajuan" ? "bg-primary text-white shadow-md" : "text-gray-500 hover:bg-gray-50"}`}
           >
             Pengajuan Baru
           </button>
-          <button 
+          <button
             onClick={() => handleTabSwitch("lacak")}
-            className={`flex-1 py-3 text-center rounded-xl font-bold transition-all ${activeTab === 'lacak' ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            className={`flex-1 py-3 text-center rounded-xl font-bold transition-all ${activeTab === "lacak" ? "bg-primary text-white shadow-md" : "text-gray-500 hover:bg-gray-50"}`}
           >
             Lacak Surat
           </button>
         </div>
 
-        {activeTab === 'pengajuan' ? (
+        {activeTab === "pengajuan" ? (
           <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
             {status === "success" ? (
               <div className="text-center py-10">
@@ -132,9 +145,7 @@ export default function SuratPage() {
                   <CheckCircle2 size={40} className="text-green-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2 font-heading">Berhasil Diajukan!</h3>
-                <p className="text-gray-600 mb-6">
-                  Permohonan surat Anda sedang diproses oleh staf desa.
-                </p>
+                <p className="text-gray-600 mb-6">Permohonan surat Anda sedang diproses oleh staf desa.</p>
                 <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8 inline-block text-left">
                   <span className="block text-sm text-gray-500 mb-1">Kode Pelacakan Anda:</span>
                   <div className="text-3xl font-mono font-bold text-primary tracking-wider bg-white px-6 py-2 rounded-xl shadow-sm border border-gray-100">
@@ -143,7 +154,7 @@ export default function SuratPage() {
                   <span className="block text-xs text-red-500 mt-2 font-medium">*Simpan kode ini untuk melacak status surat.</span>
                 </div>
                 <br/>
-                <button 
+                <button
                   onClick={() => setStatus("idle")}
                   className="bg-primary hover:bg-primary-light text-white px-6 py-3 rounded-full font-medium transition-colors"
                 >
@@ -154,24 +165,30 @@ export default function SuratPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Jenis Surat</label>
-                  <select 
+                  <select
                     required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                     value={formData.jenis_surat}
                     onChange={(e) => setFormData({...formData, jenis_surat: e.target.value})}
                   >
                     <option value="">-- Pilih Jenis Surat --</option>
-                    <option value="Surat Keterangan Usaha (SKU)">Surat Keterangan Usaha (SKU)</option>
-                    <option value="Surat Keterangan Tidak Mampu (SKTM)">Surat Keterangan Tidak Mampu (SKTM)</option>
-                    <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
-                    <option value="Surat Pengantar Nikah">Surat Pengantar Nikah</option>
-                    <option value="Surat Keterangan Kematian">Surat Keterangan Kematian</option>
+                    {jenisSuratList.map(j => (
+                      <option key={j.id} value={j.nama_surat}>{j.nama_surat}</option>
+                    ))}
                   </select>
                 </div>
 
+                {/* Tampilkan persyaratan jika ada */}
+                {selectedJenis?.persyaratan && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                    <p className="text-sm font-bold text-amber-800 mb-2">📋 Persyaratan yang perlu disiapkan:</p>
+                    <p className="text-sm text-amber-700 whitespace-pre-line">{selectedJenis.persyaratan}</p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nomor WhatsApp Aktif</label>
-                  <input 
+                  <input
                     type="tel"
                     required
                     pattern="^08[0-9]{8,11}$"
@@ -186,14 +203,14 @@ export default function SuratPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Keperluan</label>
-                  <textarea 
+                  <textarea
                     required
                     rows={4}
                     placeholder="Jelaskan keperluan pembuatan surat secara detail..."
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
                     value={formData.keperluan}
                     onChange={(e) => setFormData({...formData, keperluan: e.target.value})}
-                  ></textarea>
+                  />
                 </div>
 
                 {status === "error" && (
@@ -202,13 +219,13 @@ export default function SuratPage() {
                   </div>
                 )}
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={status === "loading"}
                   className="w-full bg-primary hover:bg-primary-light text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {status === "loading" ? (
-                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>Kirim Pengajuan <Send size={18} /></>
                   )}
@@ -220,23 +237,23 @@ export default function SuratPage() {
           <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
             <h2 className="text-xl font-bold text-gray-900 mb-6 font-heading">Lacak Status Pengajuan</h2>
             <form onSubmit={handleTrack} className="flex gap-3 mb-8">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 placeholder="Masukkan Kode Pelacakan (Contoh: TRK-XXXXXX)"
                 className="flex-1 px-5 py-4 rounded-xl border border-gray-200 text-gray-900 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-mono uppercase"
                 value={trackInput}
                 onChange={(e) => setTrackInput(e.target.value.toUpperCase())}
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={trackLoading}
                 className="bg-gray-900 hover:bg-black text-white px-6 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-70"
               >
                 {trackLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <>Cari <Search size={18} /></>
+                  <><Search size={18} /> Cari</>
                 )}
               </button>
             </form>
@@ -255,14 +272,13 @@ export default function SuratPage() {
                     <p className="text-xl font-mono font-bold text-gray-900">{trackResult.tracking_code}</p>
                   </div>
                   <div className={`px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2
-                    ${trackResult.status === 'Selesai' ? 'bg-green-100 text-green-700' : 
-                      trackResult.status === 'Diproses' ? 'bg-blue-100 text-blue-700' : 
-                      trackResult.status === 'Ditolak' ? 'bg-red-100 text-red-700' : 
-                      'bg-yellow-100 text-yellow-700'}`}>
+                    ${trackResult.status === "Selesai" ? "bg-green-100 text-green-700" :
+                      trackResult.status === "Diproses" ? "bg-blue-100 text-blue-700" :
+                      trackResult.status === "Ditolak" ? "bg-red-100 text-red-700" :
+                      "bg-yellow-100 text-yellow-700"}`}>
                     {getStatusIcon(trackResult.status)} {trackResult.status}
                   </div>
                 </div>
-
                 <div className="space-y-4">
                   <div className="bg-white p-4 rounded-xl border border-gray-100">
                     <p className="text-sm text-gray-500 mb-1">Jenis Surat</p>
@@ -278,10 +294,9 @@ export default function SuratPage() {
                       <p className="font-medium text-gray-900">{trackResult.terakhir_diperbarui}</p>
                     </div>
                   </div>
-
-                  {trackResult.status === 'Selesai' && (
+                  {trackResult.status === "Selesai" && (
                     <div className="mt-6">
-                      <a 
+                      <a
                         href={`${process.env.NEXT_PUBLIC_API_URL}/surat/${trackResult.tracking_code}/pdf`}
                         target="_blank"
                         rel="noopener noreferrer"
