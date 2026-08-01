@@ -53,6 +53,7 @@ class PengaduanController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'isi_laporan' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $nik = $request->user()->email;

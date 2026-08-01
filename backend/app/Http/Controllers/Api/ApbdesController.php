@@ -35,7 +35,7 @@ class ApbdesController extends Controller
             'realisasi' => 'nullable|numeric',
         ]);
 
-        $item = ApbdesAnggaran::create($request->all());
+        $item = ApbdesAnggaran::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $item], 201);
     }
 
@@ -44,7 +44,7 @@ class ApbdesController extends Controller
         $item = ApbdesAnggaran::find($id);
         if (!$item) return response()->json(['status' => 'error'], 404);
 
-        $item->update($request->all());
+        $item->update($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $item]);
     }
 

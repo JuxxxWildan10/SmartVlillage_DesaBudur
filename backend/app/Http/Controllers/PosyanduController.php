@@ -16,14 +16,14 @@ class PosyanduController extends Controller
 
     public function store(Request $request)
     {
-        $posyandu = Posyandu::create($request->all());
+        $posyandu = Posyandu::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $posyandu], 201);
     }
 
     public function update(Request $request, $id)
     {
         $posyandu = Posyandu::find($id);
-        if ($posyandu) $posyandu->update($request->all());
+        if ($posyandu) $posyandu->update($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $posyandu]);
     }
 

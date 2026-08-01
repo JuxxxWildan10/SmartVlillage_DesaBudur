@@ -24,7 +24,7 @@ class BansosController extends Controller
 
     public function store(Request $request)
     {
-        $program = BansosProgram::create($request->all());
+        $program = BansosProgram::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json([
             'status' => 'success',
             'data' => $program
@@ -36,7 +36,7 @@ class BansosController extends Controller
         $program = BansosProgram::find($id);
         if (!$program) return response()->json(['status' => 'error'], 404);
 
-        $program->update($request->all());
+        $program->update($request->except(['id', 'created_at', 'updated_at']));
 
         return response()->json([
             'status' => 'success',

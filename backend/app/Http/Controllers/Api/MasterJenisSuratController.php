@@ -21,7 +21,7 @@ class MasterJenisSuratController extends Controller
             'nama_surat' => 'required|string',
         ]);
 
-        $jenis = MasterJenisSurat::create($request->all());
+        $jenis = MasterJenisSurat::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $jenis], 201);
     }
 
@@ -30,7 +30,7 @@ class MasterJenisSuratController extends Controller
         $jenis = MasterJenisSurat::find($id);
         if (!$jenis) return response()->json(['status' => 'error', 'message' => 'Tidak ditemukan'], 404);
 
-        $jenis->update($request->all());
+        $jenis->update($request->except(['id', 'created_at', 'updated_at']));
         return response()->json(['status' => 'success', 'data' => $jenis]);
     }
 

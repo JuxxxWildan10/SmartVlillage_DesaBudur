@@ -24,6 +24,12 @@ class UmkmController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'nama_produk' => 'required|string',
+            'pemilik' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
         $data = $request->except('foto');
 
         if ($request->hasFile('foto')) {
@@ -42,6 +48,10 @@ class UmkmController extends Controller
     {
         $product = UmkmProduct::find($id);
         if (!$product) return response()->json(['status' => 'error'], 404);
+
+        $request->validate([
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
 
         $data = $request->except('foto');
 

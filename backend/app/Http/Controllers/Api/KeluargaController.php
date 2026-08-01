@@ -29,7 +29,7 @@ class KeluargaController extends Controller
             'dusun' => 'required',
         ]);
 
-        $keluarga = Keluarga::create($request->all());
+        $keluarga = Keluarga::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json([
             'status' => 'success',
             'data' => $keluarga
@@ -87,7 +87,7 @@ class KeluargaController extends Controller
             'kepala_keluarga' => 'required',
         ]);
 
-        $keluarga->update($request->all());
+        $keluarga->update($request->except(['id', 'created_at', 'updated_at']));
 
         return response()->json([
             'status' => 'success',

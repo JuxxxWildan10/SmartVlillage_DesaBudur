@@ -53,7 +53,7 @@ class PendudukController extends Controller
 
     public function store(Request $request)
     {
-        $penduduk = Penduduk::create($request->all());
+        $penduduk = Penduduk::create($request->except(['id', 'created_at', 'updated_at']));
         return response()->json([
             'status' => 'success',
             'data' => $penduduk
@@ -108,7 +108,7 @@ class PendudukController extends Controller
         $penduduk = Penduduk::find($id);
         if (!$penduduk) return response()->json(['status' => 'error'], 404);
 
-        $penduduk->update($request->all());
+        $penduduk->update($request->except(['id', 'created_at', 'updated_at']));
 
         return response()->json([
             'status' => 'success',

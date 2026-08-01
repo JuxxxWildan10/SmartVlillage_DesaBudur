@@ -19,6 +19,7 @@ class AparaturDesaController extends Controller
         $request->validate([
             'nama_lengkap' => 'required|string',
             'jabatan' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = $request->except('foto');
@@ -37,6 +38,10 @@ class AparaturDesaController extends Controller
         if (!$aparatur) return response()->json(['status' => 'error', 'message' => 'Tidak ditemukan'], 404);
 
         $data = $request->except('foto');
+        $request->validate([
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('aparatur', 'public');
             $data['foto'] = '/api/aparatur/image/' . basename($path);

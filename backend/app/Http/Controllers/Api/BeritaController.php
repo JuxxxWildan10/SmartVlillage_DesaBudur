@@ -39,6 +39,7 @@ class BeritaController extends Controller
             'judul' => 'required',
             'kategori' => 'required',
             'isi_berita' => 'required',
+            'gambar_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = $request->except('gambar_url_file');
@@ -59,6 +60,10 @@ class BeritaController extends Controller
     {
         $berita = Berita::find($id);
         if (!$berita) return response()->json(['status' => 'error'], 404);
+
+        $request->validate([
+            'gambar_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
 
         $data = $request->except('gambar_url_file');
         if ($request->hasFile('gambar_url')) {
