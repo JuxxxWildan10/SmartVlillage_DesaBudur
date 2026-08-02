@@ -1,0 +1,3 @@
+# Procfile untuk Railway (opsional — nixpacks.toml sudah cukup)
+# Aktifkan queue worker jika diperlukan
+web: php artisan serve --host=0.0.0.0 --port=$PORT
