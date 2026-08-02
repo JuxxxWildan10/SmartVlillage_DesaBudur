@@ -68,9 +68,9 @@ class PengaduanController extends Controller
 
         $data = [
             'penduduk_id' => $penduduk->id,
-            'judul' => $request->judul,
-            'isi_laporan' => $request->isi_laporan,
-            'status' => 'Menunggu'
+            'judul'       => strip_tags($request->judul),
+            'isi_laporan' => strip_tags($request->isi_laporan),
+            'status'      => 'Menunggu',
         ];
 
         if ($request->hasFile('foto')) {
@@ -100,12 +100,15 @@ class PengaduanController extends Controller
         $updateData = [];
 
         if ($request->has('status')) {
-            $updateData['status'] = $request->status;
+            $allowedStatuses = ['Menunggu', 'Diproses', 'Selesai', 'Ditolak'];
+            if (in_array($request->status, $allowedStatuses)) {
+                $updateData['status'] = $request->status;
+            }
         }
 
         if ($request->has('tanggapan_admin') && !empty($request->tanggapan_admin)) {
-            $updateData['tanggapan_admin'] = $request->tanggapan_admin;
-            $updateData['tanggapan_at'] = now();
+            $updateData['tanggapan_admin'] = strip_tags($request->tanggapan_admin);
+            $updateData['tanggapan_at']    = now();
         }
 
         $pengaduan->update($updateData);

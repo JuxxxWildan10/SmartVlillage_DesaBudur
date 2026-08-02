@@ -24,6 +24,7 @@ export default function RegisterPage() {
       
       localStorage.setItem("auth_token", data.token);
       localStorage.setItem("user_role", data.role);
+      localStorage.setItem("user_name", data.user?.name || formData.name);
       localStorage.setItem("user_nik", formData.nik);
       
       router.push("/warga");
@@ -103,11 +104,11 @@ export default function RegisterPage() {
             <input 
               type="password" 
               required
-              minLength={6}
+              minLength={8}
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:border-primary transition-all text-gray-900"
-              placeholder="Minimal 6 karakter"
+              placeholder="Minimal 8 karakter (huruf + angka)"
             />
           </div>
 

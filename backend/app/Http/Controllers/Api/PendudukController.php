@@ -53,10 +53,46 @@ class PendudukController extends Controller
 
     public function store(Request $request)
     {
-        $penduduk = Penduduk::create($request->except(['id', 'created_at', 'updated_at']));
+        $request->validate([
+            'nik'                             => 'required|string|min:16|max:16|regex:/^[0-9]+$/|unique:penduduk,nik',
+            'nama_lengkap'                    => 'required|string|max:255',
+            'tempat_lahir'                    => 'required|string|max:100',
+            'tanggal_lahir'                   => 'required|date',
+            'jenis_kelamin'                   => 'required|in:Laki-laki,Perempuan',
+            'agama'                           => 'required|in:Islam,Kristen,Katolik,Hindu,Budha,Konghucu,Lainnya',
+            'pendidikan'                      => 'required|string|max:100',
+            'pekerjaan'                       => 'required|string|max:100',
+            'status_perkawinan'               => 'required|in:Belum Kawin,Kawin,Cerai Hidup,Cerai Mati',
+            'status_hubungan_dalam_keluarga'  => 'required|string|max:50',
+            'kewarganegaraan'                 => 'required|in:WNI,WNA',
+            'golongan_darah'                  => 'nullable|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'keluarga_id'                     => 'nullable|exists:keluarga,id',
+        ], [
+            'nik.min'    => 'NIK harus 16 digit.',
+            'nik.max'    => 'NIK harus 16 digit.',
+            'nik.regex'  => 'NIK hanya boleh berisi angka.',
+            'nik.unique' => 'NIK sudah terdaftar.',
+        ]);
+
+        $penduduk = Penduduk::create([
+            'nik'                             => strip_tags($request->nik),
+            'nama_lengkap'                    => strip_tags($request->nama_lengkap),
+            'tempat_lahir'                    => strip_tags($request->tempat_lahir),
+            'tanggal_lahir'                   => $request->tanggal_lahir,
+            'jenis_kelamin'                   => $request->jenis_kelamin,
+            'agama'                           => $request->agama,
+            'pendidikan'                      => strip_tags($request->pendidikan),
+            'pekerjaan'                       => strip_tags($request->pekerjaan),
+            'status_perkawinan'               => $request->status_perkawinan,
+            'status_hubungan_dalam_keluarga'  => strip_tags($request->status_hubungan_dalam_keluarga),
+            'kewarganegaraan'                 => $request->kewarganegaraan,
+            'golongan_darah'                  => $request->golongan_darah,
+            'keluarga_id'                     => $request->keluarga_id,
+        ]);
+
         return response()->json([
             'status' => 'success',
-            'data' => $penduduk
+            'data'   => $penduduk,
         ], 201);
     }
 
@@ -106,13 +142,41 @@ class PendudukController extends Controller
     public function update(Request $request, $id)
     {
         $penduduk = Penduduk::find($id);
-        if (!$penduduk) return response()->json(['status' => 'error'], 404);
+        if (!$penduduk) return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
 
-        $penduduk->update($request->except(['id', 'created_at', 'updated_at']));
+        $request->validate([
+            'nik'           => 'sometimes|string|min:16|max:16|regex:/^[0-9]+$/|unique:penduduk,nik,'.$id,
+            'nama_lengkap'  => 'sometimes|string|max:255',
+            'tanggal_lahir' => 'sometimes|date',
+            'jenis_kelamin' => 'sometimes|in:Laki-laki,Perempuan',
+            'agama'         => 'sometimes|in:Islam,Kristen,Katolik,Hindu,Budha,Konghucu,Lainnya',
+            'status_perkawinan' => 'sometimes|in:Belum Kawin,Kawin,Cerai Hidup,Cerai Mati',
+            'kewarganegaraan'   => 'sometimes|in:WNI,WNA',
+            'golongan_darah'    => 'nullable|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'keluarga_id'       => 'nullable|exists:keluarga,id',
+        ]);
+
+        $allowed = [
+            'nik', 'keluarga_id', 'nama_lengkap', 'tempat_lahir',
+            'tanggal_lahir', 'jenis_kelamin', 'agama', 'pendidikan',
+            'pekerjaan', 'status_perkawinan', 'status_hubungan_dalam_keluarga',
+            'kewarganegaraan', 'golongan_darah',
+        ];
+
+        $data = array_intersect_key($request->all(), array_flip($allowed));
+
+        // Sanitasi field teks bebas
+        foreach (['nik', 'nama_lengkap', 'tempat_lahir', 'pendidikan', 'pekerjaan', 'status_hubungan_dalam_keluarga'] as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = strip_tags($data[$field]);
+            }
+        }
+
+        $penduduk->update($data);
 
         return response()->json([
             'status' => 'success',
-            'data' => $penduduk
+            'data'   => $penduduk,
         ]);
     }
 

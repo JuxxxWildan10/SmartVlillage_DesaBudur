@@ -162,13 +162,22 @@ class SuratController extends Controller
     }
 
     /**
-     * Generate PDF surat (Public via tracking code, Admin via ID)
+     * Generate PDF surat.
+     * Keamanan: hanya boleh diakses via TRACKING CODE resmi (bukan ID integer).
+     * Mencegah enumeration attack (orang lain nebak ID orang lain).
      */
     public function generatePdf($identifier)
     {
+        // Pastikan identifier adalah tracking code (format TRK-XXXXXX), bukan integer ID
+        if (!preg_match('/^TRK-[A-Z0-9]{6}$/i', $identifier)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Format kode tidak valid. Gunakan kode tracking yang diberikan saat pengajuan surat.',
+            ], 400);
+        }
+
         $surat = Surat::with('penduduk')
-            ->where('id', $identifier)
-            ->orWhere('tracking_code', $identifier)
+            ->where('tracking_code', $identifier)
             ->first();
 
         if (!$surat) {
@@ -182,9 +191,9 @@ class SuratController extends Controller
         $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode(url("/layanan?track=" . $surat->tracking_code));
 
         $data = [
-            'surat' => $surat,
-            'penduduk' => $surat->penduduk,
-            'qrCodeUrl' => $qrCodeUrl
+            'surat'     => $surat,
+            'penduduk'  => $surat->penduduk,
+            'qrCodeUrl' => $qrCodeUrl,
         ];
 
         // Pilih template berdasarkan jenis surat

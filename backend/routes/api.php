@@ -42,31 +42,50 @@ Route::get('/master-surat', [\App\Http\Controllers\Api\MasterJenisSuratControlle
 Route::get('/apbdes', [\App\Http\Controllers\Api\ApbdesController::class, 'index']);
 Route::get('/aparatur', [\App\Http\Controllers\Api\AparaturDesaController::class, 'index']);
 
-// Public Media Serving
+// Public Media Serving — dengan proteksi path traversal
 Route::get('/umkm/image/{filename}', function ($filename) {
+    // Validasi: hanya karakter aman yang diizinkan (tidak ada ../ atau path lain)
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || str_contains($filename, '..')) {
+        abort(400, 'Nama file tidak valid.');
+    }
     $path = storage_path('app/public/umkm/' . $filename);
     if (!file_exists($path)) abort(404);
     $mime = mime_content_type($path) ?: 'image/jpeg';
+    // Pastikan hanya file gambar yang bisa diakses
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
     return response(file_get_contents($path), 200)->header('Content-Type', $mime);
 });
 Route::get('/berita/image/{filename}', function ($filename) {
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || str_contains($filename, '..')) {
+        abort(400, 'Nama file tidak valid.');
+    }
     $path = storage_path('app/public/berita/' . $filename);
     if (!file_exists($path)) abort(404);
     $mime = mime_content_type($path) ?: 'image/jpeg';
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
     return response(file_get_contents($path), 200)->header('Content-Type', $mime);
 });
 Route::get('/pengaduan/image/{filename}', function ($filename) {
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || str_contains($filename, '..')) {
+        abort(400, 'Nama file tidak valid.');
+    }
     $path = storage_path('app/public/pengaduan/' . $filename);
     if (!file_exists($path)) abort(404);
     $mime = mime_content_type($path) ?: 'image/jpeg';
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
     return response(file_get_contents($path), 200)->header('Content-Type', $mime);
 });
 Route::get('/aparatur/image/{filename}', function ($filename) {
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || str_contains($filename, '..')) {
+        abort(400, 'Nama file tidak valid.');
+    }
     $path = storage_path('app/public/aparatur/' . $filename);
     if (!file_exists($path)) abort(404);
     $mime = mime_content_type($path) ?: 'image/jpeg';
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
     return response(file_get_contents($path), 200)->header('Content-Type', $mime);
 });
+
 
 // ===================================================================
 // AUTHENTICATION (Rate Limited)

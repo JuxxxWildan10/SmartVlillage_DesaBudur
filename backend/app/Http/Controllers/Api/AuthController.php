@@ -15,18 +15,31 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'nik' => 'required|string|unique:users,email|max:16',
-            'rt' => 'required|string|max:5',
-            'rw' => 'required|string|max:5',
-            'password' => 'required|string|min:6'
+            'nik'  => 'required|string|unique:users,email|min:16|max:16|regex:/^[0-9]+$/',
+            'rt'   => 'required|string|max:5|regex:/^[0-9]+$/',
+            'rw'   => 'required|string|max:5|regex:/^[0-9]+$/',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-zA-Z])(?=.*[0-9]).+$/', // Minimal 1 huruf + 1 angka
+            ],
+        ], [
+            'nik.min'          => 'NIK harus 16 digit.',
+            'nik.max'          => 'NIK harus 16 digit.',
+            'nik.regex'        => 'NIK hanya boleh berisi angka.',
+            'password.min'     => 'Password minimal 8 karakter.',
+            'password.regex'   => 'Password harus mengandung minimal 1 huruf dan 1 angka.',
+            'rt.regex'         => 'RT hanya boleh berisi angka.',
+            'rw.regex'         => 'RW hanya boleh berisi angka.',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->nik, // Using email column for NIK
-            'rt' => $request->rt,
-            'rw' => $request->rw,
-            'password' => Hash::make($request->password)
+            'name'     => strip_tags($request->name),
+            'email'    => strip_tags($request->nik), // NIK disimpan di kolom email
+            'rt'       => strip_tags($request->rt),
+            'rw'       => strip_tags($request->rw),
+            'password' => Hash::make($request->password),
         ]);
 
         $user->assignRole('Warga');
@@ -34,15 +47,16 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Registrasi berhasil',
-            'data' => [
-                'user' => $user,
+            'data'    => [
+                'user' => $user->only(['id', 'name', 'rt', 'rw', 'created_at']),
                 'role' => 'Warga',
-                'token' => $token
-            ]
+                'token' => $token,
+            ],
         ], 201);
     }
+
 
     public function login(Request $request)
     {
@@ -64,13 +78,19 @@ class AuthController extends Controller
             $role = $user->roles->first()->name ?? 'Warga';
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Login successful',
-                'data' => [
-                    'user' => $user,
-                    'role' => $role,
-                    'token' => $token
-                ]
+                'data'    => [
+                    'user'  => [
+                        'id'   => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email, // NIK tersimpan di kolom email
+                        'rt'   => $user->rt,
+                        'rw'   => $user->rw,
+                    ],
+                    'role'  => $role,
+                    'token' => $token,
+                ],
             ]);
         }
 
@@ -95,10 +115,16 @@ class AuthController extends Controller
         $user = $request->user();
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'user' => $user,
-                'role' => $user->roles->first()->name ?? 'Warga'
-            ]
+            'data'   => [
+                'user' => [
+                    'id'    => $user->id,
+                    'name'  => $user->name,
+                    'email' => $user->email,
+                    'rt'    => $user->rt,
+                    'rw'    => $user->rw,
+                ],
+                'role' => $user->roles->first()->name ?? 'Warga',
+            ],
         ]);
     }
 }
