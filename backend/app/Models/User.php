@@ -47,7 +47,15 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
+    }
+
+    /**
+     * Data penduduk yang terhubung ke akun ini (via NIK = users.email).
+     */
+    public function penduduk()
+    {
+        return $this->hasOne(\App\Models\Penduduk::class, 'nik', 'email');
     }
 }
