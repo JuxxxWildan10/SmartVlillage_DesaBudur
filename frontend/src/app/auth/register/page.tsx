@@ -80,8 +80,8 @@ export default function RegisterPage() {
 
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary rounded-2xl shadow-xl flex items-center justify-center text-white mx-auto mb-4">
-            <ShieldCheck size={32} />
+          <div className="w-20 h-24 mx-auto mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain filter drop-shadow-lg" />
           </div>
           <h1 className="text-3xl font-heading font-bold text-gray-900">Daftar Akun Warga</h1>
           <p className="text-gray-500 mt-2 text-sm leading-relaxed">

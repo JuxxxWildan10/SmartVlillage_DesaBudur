@@ -25,9 +25,14 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-full flex flex-col shadow-sm">
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="font-heading font-bold text-2xl text-primary">Desa Budur</h2>
-        <p className="text-xs text-gray-500 mt-1">Layanan Warga Pintar</p>
+      <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+        <div className="w-10 h-10 bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm rounded-md border border-gray-100">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain" />
+        </div>
+        <div>
+          <h2 className="font-heading font-bold text-xl text-primary">Desa Budur</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Layanan Warga Pintar</p>
+        </div>
       </div>
 
       <nav className="flex-1 py-6 px-4 space-y-2">

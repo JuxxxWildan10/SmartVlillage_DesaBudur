@@ -66,8 +66,8 @@ function LoginForm() {
           <ArrowLeft size={16} /> Kembali ke Beranda
         </Link>
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-primary rounded-2xl shadow-xl flex-center text-white mb-4">
-            <ShieldCheck size={32} />
+          <div className="w-20 h-24 mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain filter drop-shadow-lg" />
           </div>
         </div>
         <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900 font-heading">
