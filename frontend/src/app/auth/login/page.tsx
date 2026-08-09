@@ -123,7 +123,7 @@ function LoginForm() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary hover:text-primary-dark">Lupa password?</a>
+                <Link href="/auth/forgot-password" className="font-medium text-primary hover:text-primary-dark">Lupa password?</Link>
               </div>
             </div>
 
