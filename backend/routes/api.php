@@ -132,8 +132,9 @@ Route::middleware('throttle:10,1')->group(function () {
 // ===================================================================
 
 Route::middleware('auth:sanctum')->group(function () {
-    // Auth utilities
+    // Protected Auth Routes
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/me', [AuthController::class, 'me']);
 
     // ---------------------------------------------------------------

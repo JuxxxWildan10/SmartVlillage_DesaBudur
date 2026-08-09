@@ -143,7 +143,48 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Logout successful'
+            'message' => 'Logged out successfully'
+        ]);
+    }
+
+    /**
+     * Ganti password user yang sedang login.
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed', // requires new_password_confirmation field
+                'regex:/^(?=.*[a-zA-Z])(?=.*[0-9]).+$/', // minimal 1 huruf 1 angka
+            ],
+        ], [
+            'new_password.min' => 'Password baru minimal 8 karakter.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'new_password.regex' => 'Password baru harus mengandung minimal 1 huruf dan 1 angka.',
+        ]);
+
+        $user = Auth::user();
+
+        // Validasi password lama
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password saat ini salah.'
+            ], 400);
+        }
+
+        // Update password baru
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password berhasil diubah. Pastikan Anda mengingat password baru Anda.'
         ]);
     }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, MessageSquare, Home, LogOut } from "lucide-react";
+import { LayoutDashboard, FileText, MessageSquare, Home, LogOut, ShieldCheck } from "lucide-react";
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     { name: "Dashboard Warga", icon: LayoutDashboard, href: "/warga" },
     { name: "Riwayat e-Surat", icon: FileText, href: "/warga/surat" },
     { name: "Riwayat Pengaduan", icon: MessageSquare, href: "/warga/pengaduan" },
+    { name: "Pengaturan Akun", icon: ShieldCheck, href: "/warga/pengaturan" },
     { name: "Kembali ke Beranda", icon: Home, href: "/" },
   ];
 
