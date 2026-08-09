@@ -10,12 +10,14 @@ class ForumReplyController extends Controller
 {
     public function store(Request $request, $topicId)
     {
-        $request->validate(['isi' => 'required|string']);
+        $request->validate([
+            'isi' => 'required|string|max:3000',
+        ]);
 
         $reply = ForumReply::create([
-            'topic_id' => $topicId,
+            'topic_id' => (int) $topicId,
             'user_nik' => $request->user()->email,
-            'isi' => $request->isi
+            'isi'      => strip_tags($request->isi),
         ]);
         return response()->json(['status' => 'success', 'data' => $reply], 201);
     }

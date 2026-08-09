@@ -26,12 +26,15 @@ class ForumTopicController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['judul' => 'required|string', 'isi' => 'required|string']);
+        $request->validate([
+            'judul' => 'required|string|max:200',
+            'isi'   => 'required|string|max:5000',
+        ]);
         
         $topic = ForumTopic::create([
             'user_nik' => $request->user()->email,
-            'judul' => $request->judul,
-            'isi' => $request->isi
+            'judul'    => strip_tags($request->judul),
+            'isi'      => strip_tags($request->isi),
         ]);
         return response()->json(['status' => 'success', 'data' => $topic], 201);
     }
@@ -39,8 +42,22 @@ class ForumTopicController extends Controller
     public function update(Request $request, $id)
     {
         $topic = ForumTopic::find($id);
-        // Ensure user is the owner or admin
-        if ($topic) $topic->update($request->only(['judul', 'isi', 'status']));
+        if (!$topic) {
+            return response()->json(['status' => 'error', 'message' => 'Topik tidak ditemukan'], 404);
+        }
+
+        $request->validate([
+            'judul'  => 'sometimes|string|max:200',
+            'isi'    => 'sometimes|string|max:5000',
+            'status' => 'sometimes|in:Open,Closed',
+        ]);
+
+        $updateData = [];
+        if ($request->has('judul'))  $updateData['judul']  = strip_tags($request->judul);
+        if ($request->has('isi'))    $updateData['isi']    = strip_tags($request->isi);
+        if ($request->has('status')) $updateData['status'] = $request->status;
+
+        $topic->update($updateData);
         return response()->json(['status' => 'success', 'data' => $topic]);
     }
 

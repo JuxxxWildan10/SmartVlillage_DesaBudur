@@ -56,9 +56,11 @@ class SuratController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis_surat' => 'required|string',
-            'keperluan' => 'required|string',
-            'nomor_wa' => 'required|string|max:20'
+            'jenis_surat' => 'required|string|max:255',
+            'keperluan'   => 'required|string|max:500',
+            'nomor_wa'    => 'required|string|regex:/^[0-9+]{8,15}$/|max:15',
+        ], [
+            'nomor_wa.regex' => 'Format nomor WhatsApp tidak valid. Gunakan format: 628xxxxxxxx',
         ]);
 
         // NIK disimpan di field email pada tabel users
@@ -75,11 +77,11 @@ class SuratController extends Controller
         $trackingCode = 'TRK-' . strtoupper(Str::random(6));
 
         $surat = Surat::create([
-            'penduduk_id' => $penduduk->id,
-            'jenis_surat' => $request->jenis_surat,
-            'keperluan' => $request->keperluan,
-            'nomor_wa' => $request->nomor_wa,
-            'status' => 'Menunggu',
+            'penduduk_id'   => $penduduk->id,
+            'jenis_surat'   => strip_tags($request->jenis_surat),
+            'keperluan'     => strip_tags($request->keperluan),
+            'nomor_wa'      => preg_replace('/[^0-9+]/', '', $request->nomor_wa),
+            'status'        => 'Menunggu',
             'tracking_code' => $trackingCode
         ]);
 
