@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="w-20 h-24 mx-auto mb-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain filter drop-shadow-lg" />
+            <img src="/logo-cirebon.png" alt="Logo Cirebon" className="w-full h-full object-contain filter drop-shadow-lg" />
           </div>
           <h1 className="text-3xl font-heading font-bold text-gray-900">Lupa Password?</h1>
           <p className="text-gray-500 mt-2 text-sm leading-relaxed">

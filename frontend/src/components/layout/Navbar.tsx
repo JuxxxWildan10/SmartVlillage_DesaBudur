@@ -70,7 +70,7 @@ export default function Navbar() {
         {/* Logo */}
         <div onClick={handleLogoClick} className="cursor-pointer flex items-center gap-3 group">
           <div className="w-10 h-10 bg-white flex items-center justify-center p-1 overflow-hidden shadow-lg shadow-black/20 group-hover:rotate-12 transition-all rounded-md">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain" />
+            <img src="/logo-cirebon.png" alt="Logo Cirebon" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className={`font-heading font-bold text-lg leading-tight ${scrolled ? 'text-white' : 'text-white drop-shadow-md'}`}>

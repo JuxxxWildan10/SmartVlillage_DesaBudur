@@ -69,7 +69,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     <aside className="w-64 bg-primary-dark text-white h-full flex flex-col shadow-xl">
       <div className="p-6 border-b border-white/10 flex items-center gap-3">
         <div className="w-10 h-10 bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm rounded-md border border-gray-100 shrink-0">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Coat_of_arms_of_Cirebon_Regency.svg" alt="Logo Cirebon" className="w-full h-full object-contain" />
+          <img src="/logo-cirebon.png" alt="Logo Cirebon" className="w-full h-full object-contain" />
         </div>
         <div>
           <h2 className="font-heading font-bold text-xl text-gold-light">Desa Budur</h2>
