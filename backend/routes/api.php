@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\UmkmController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
+use App\Http\Controllers\Api\ArtikelController;
 use App\Http\Controllers\Api\BansosController;
 use App\Http\Controllers\Api\PendudukController;
 use App\Http\Controllers\Api\KeluargaController;
@@ -33,6 +34,10 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/forum/{id}', [\App\Http\Controllers\ForumTopicController::class, 'show']);
     Route::get('/berita', [BeritaController::class, 'index']);
     Route::get('/berita/{id}', [BeritaController::class, 'show']);
+
+    // Public Artikel
+    Route::get('/artikel', [ArtikelController::class, 'index']);
+    Route::get('/artikel/{id}', [ArtikelController::class, 'show']);
 
     // Public Surat Tracking (no auth needed for tracking)
     Route::get('/surat/track/{code}', [SuratController::class, 'track']);
@@ -102,7 +107,16 @@ Route::get('/pembangunan/image/{filename}', function ($filename) {
     if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
     return response(file_get_contents($path), 200)->header('Content-Type', $mime);
 });
-
+Route::get('/artikel/image/{filename}', function ($filename) {
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $filename) || str_contains($filename, '..')) {
+        abort(400, 'Nama file tidak valid.');
+    }
+    $path = storage_path('app/public/artikel/' . $filename);
+    if (!file_exists($path)) abort(404);
+    $mime = mime_content_type($path) ?: 'image/jpeg';
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'])) abort(403);
+    return response(file_get_contents($path), 200)->header('Content-Type', $mime);
+});
 
 // ===================================================================
 // AUTHENTICATION (Rate Limited)
@@ -196,10 +210,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/bansos/penerima/{penerima_id}', [BansosController::class, 'updatePenerima']);
         Route::delete('/bansos/penerima/{penerima_id}', [BansosController::class, 'removePenerima']);
 
-        // Kelola Berita
+        // Kelola Berita (Jadwal & Acara Desa)
         Route::post('/berita', [BeritaController::class, 'store']);
         Route::put('/berita/{id}', [BeritaController::class, 'update']);
         Route::delete('/berita/{id}', [BeritaController::class, 'destroy']);
+
+        // Kelola Artikel (Edukasi & Informasi)
+        Route::post('/artikel', [ArtikelController::class, 'store']);
+        Route::put('/artikel/{id}', [ArtikelController::class, 'update']);
+        Route::delete('/artikel/{id}', [ArtikelController::class, 'destroy']);
 
         // Kelola Penduduk
         Route::get('/penduduk', [PendudukController::class, 'index']);

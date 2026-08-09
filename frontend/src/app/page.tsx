@@ -1,19 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, Activity, ShieldCheck, Users, Megaphone } from "lucide-react";
+import { ArrowRight, FileText, Activity, ShieldCheck, Users, Megaphone, Calendar, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Home() {
   const [stats, setStats] = useState({
-    total_penduduk: 0,
-    total_kk: 0,
-    target_sdgs: 0,
-    total_umkm: 0
+    total_penduduk: 0, total_kk: 0, target_sdgs: 0, total_umkm: 0
   });
   const [runningText, setRunningText] = useState("Memuat Info Desa...");
+  const [latestBerita, setLatestBerita] = useState<any[]>([]);
+  const [latestArtikel, setLatestArtikel] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch stats
@@ -27,12 +26,28 @@ export default function Home() {
 
     // Fetch running text
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/running-text`)
+      .then(res => { if (res.data.status === "success") setRunningText(res.data.data.text); })
+      .catch(err => console.error("Error fetching running text", err));
+
+    // Fetch latest berita
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/berita`)
       .then(res => {
         if (res.data.status === "success") {
-          setRunningText(res.data.data.text);
+          const published = res.data.data.filter((b: any) => b.status === "Published");
+          setLatestBerita(published.slice(0, 3));
         }
       })
-      .catch(err => console.error("Error fetching running text", err));
+      .catch(() => {});
+
+    // Fetch latest artikel
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/artikel`)
+      .then(res => {
+        if (res.data.status === "success") {
+          const published = res.data.data.filter((a: any) => a.status === "Published");
+          setLatestArtikel(published.slice(0, 3));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -127,6 +142,95 @@ export default function Home() {
             <StatCard number={stats.total_kk.toLocaleString('id-ID')} label="Kepala Keluarga" />
             <StatCard number={stats.target_sdgs.toString()} label="Target SDGs" />
             <StatCard number={stats.total_umkm.toString()} label="UMKM Aktif" />
+          </div>
+        </div>
+      </section>
+
+      {/* Berita & Acara Desa */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold mb-3">
+                <Calendar size={14} /> Jadwal & Acara
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 font-heading">Berita & Acara Desa</h2>
+            </div>
+            <Link href="/berita" className="hidden md:flex items-center gap-2 text-primary font-bold hover:text-primary-dark transition-colors text-sm">
+              Lihat Semua <ArrowRight size={16} />
+            </Link>
+          </div>
+          {latestBerita.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl text-gray-400">Belum ada jadwal acara yang dipublikasikan.</div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {latestBerita.map((item) => (
+                <div key={item.id} onClick={() => window.location.href = "/berita"}
+                  className="group cursor-pointer bg-gray-50 hover:bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-lg transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">{item.kategori}</span>
+                    {item.tanggal_acara && new Date(item.tanggal_acara) >= new Date() && (
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">🟢 Akan Datang</span>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-lg group-hover:text-primary transition-colors line-clamp-2 mb-2">{item.judul}</h3>
+                  {item.tanggal_acara && (
+                    <div className="flex items-center gap-1.5 text-sm text-blue-600 font-medium mb-1">
+                      <Calendar size={13} />
+                      {new Date(item.tanggal_acara).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    </div>
+                  )}
+                  {item.lokasi_acara && <p className="text-xs text-gray-500">📍 {item.lokasi_acara}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="text-center mt-8 md:hidden">
+            <Link href="/berita" className="inline-flex items-center gap-2 text-primary font-bold text-sm">Lihat Semua Acara <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Artikel Edukasi */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full text-sm font-semibold mb-3">
+                <BookOpen size={14} /> Edukasi Warga
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 font-heading">Artikel & Edukasi</h2>
+            </div>
+            <Link href="/artikel" className="hidden md:flex items-center gap-2 text-primary font-bold hover:text-primary-dark transition-colors text-sm">
+              Lihat Semua <ArrowRight size={16} />
+            </Link>
+          </div>
+          {latestArtikel.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl text-gray-400">Belum ada artikel yang dipublikasikan.</div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {latestArtikel.map((item) => (
+                <Link key={item.id} href={`/artikel/${item.id}`}
+                  className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
+                  <div className="h-40 overflow-hidden bg-orange-50">
+                    {item.gambar_url ? (
+                      <img src={item.gambar_url.startsWith("http") ? item.gambar_url : `${process.env.NEXT_PUBLIC_BASE_URL}${item.gambar_url}`}
+                        alt={item.judul} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"><BookOpen size={40} className="text-orange-200" /></div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">{item.kategori}</span>
+                    <h3 className="mt-3 font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 text-base">{item.judul}</h3>
+                    <p className="text-xs text-gray-400 mt-2">{new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          <div className="text-center mt-8 md:hidden">
+            <Link href="/artikel" className="inline-flex items-center gap-2 text-primary font-bold text-sm">Lihat Semua Artikel <ArrowRight size={16} /></Link>
           </div>
         </div>
       </section>

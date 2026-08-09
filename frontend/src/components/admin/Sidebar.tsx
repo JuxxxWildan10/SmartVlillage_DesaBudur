@@ -2,7 +2,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FileText, MessageSquare, Users, Store, Gift,
-  Megaphone, LogOut, Home, HeartPulse, Target, UserCog, TrendingUp, ScrollText, ChevronDown, ChevronRight, Building
+  Megaphone, LogOut, Home, HeartPulse, Target, UserCog, TrendingUp, ScrollText, ChevronDown, ChevronRight, Building, BookOpen, Calendar
 } from "lucide-react";
 import { useState } from "react";
 
@@ -27,7 +27,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     { name: "Pengaduan", icon: MessageSquare, href: "/admin/pengaduan" },
     { name: "UMKM", icon: Store, href: "/admin/umkm" },
     { name: "Bansos", icon: Gift, href: "/admin/bansos" },
-    { name: "Berita", icon: Megaphone, href: "/admin/berita" },
+    { name: "Berita & Acara", icon: Calendar, href: "/admin/berita" },
+    { name: "Artikel", icon: BookOpen, href: "/admin/artikel" },
     { name: "Posyandu", icon: HeartPulse, href: "/admin/posyandu" },
     {
       name: "Pemerintahan",
