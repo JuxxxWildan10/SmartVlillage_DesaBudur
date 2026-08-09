@@ -20,16 +20,17 @@ class KeluargaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'no_kk' => 'required|unique:keluarga|max:16',
-            'kepala_keluarga' => 'required',
-            'alamat' => 'required',
-            'rt' => 'required',
-            'rw' => 'required',
-            'dusun' => 'required',
+            'kepala_keluarga' => 'required|string|max:255',
+            'alamat' => 'required|string',
+            'rt' => 'required|string|max:3',
+            'rw' => 'required|string|max:3',
+            'dusun' => 'required|string|max:255',
+            'kode_pos' => 'nullable|string|max:5',
         ]);
 
-        $keluarga = Keluarga::create($request->except(['id', 'created_at', 'updated_at']));
+        $keluarga = Keluarga::create($validated);
         return response()->json([
             'status' => 'success',
             'data' => $keluarga
@@ -82,12 +83,17 @@ class KeluargaController extends Controller
         $keluarga = Keluarga::find($id);
         if (!$keluarga) return response()->json(['status' => 'error', 'message' => 'Not found'], 404);
 
-        $request->validate([
-            'no_kk' => 'required|max:16|unique:keluarga,no_kk,'.$id,
-            'kepala_keluarga' => 'required',
+        $validated = $request->validate([
+            'no_kk' => 'sometimes|required|max:16|unique:keluarga,no_kk,'.$id,
+            'kepala_keluarga' => 'sometimes|required|string|max:255',
+            'alamat' => 'sometimes|required|string',
+            'rt' => 'sometimes|required|string|max:3',
+            'rw' => 'sometimes|required|string|max:3',
+            'dusun' => 'sometimes|required|string|max:255',
+            'kode_pos' => 'nullable|string|max:5',
         ]);
 
-        $keluarga->update($request->except(['id', 'created_at', 'updated_at']));
+        $keluarga->update($validated);
 
         return response()->json([
             'status' => 'success',

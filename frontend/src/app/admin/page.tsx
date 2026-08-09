@@ -19,28 +19,30 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        const [suratRes, pengaduanRes, dashRes, textRes] = await Promise.all([
-          api.get("/surat"),
-          api.get("/pengaduan"),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/running-text`)
-        ]);
+        // Execute sequentially to avoid PHP built-in server deadlock on Windows
+        try {
+          const suratRes = await api.get("/surat");
+          const suratData = suratRes.data.data || [];
+          setAllSuratData(suratData);
+          setStats(prev => ({ ...prev, surat: suratData.filter((s: any) => s.status === "Menunggu").length }));
+        } catch (e) { console.error("Failed fetching surat", e); }
 
-        const suratData = suratRes.data.data || [];
-        setAllSuratData(suratData);
-        setStats({
-          surat: suratData.filter((s: any) => s.status === "Menunggu").length,
-          pengaduan: (pengaduanRes.data.data || []).filter((p: any) => p.status === "Menunggu").length,
-          penduduk: dashRes.data.data?.statistics?.total_penduduk || 0
-        });
+        try {
+          const pengaduanRes = await api.get("/pengaduan");
+          setStats(prev => ({ ...prev, pengaduan: (pengaduanRes.data.data || []).filter((p: any) => p.status === "Menunggu").length }));
+        } catch (e) { console.error("Failed fetching pengaduan", e); }
 
-        if (textRes.data.status === "success") {
-          setRunningText(textRes.data.data.raw_admin || "");
-        }
-      } catch (err) {
-        console.warn("Failed to fetch admin stats, might be unauthorized or network issue.", err);
-      }
+        try {
+          const dashRes = await api.get("/dashboard");
+          setStats(prev => ({ ...prev, penduduk: dashRes.data.data?.statistics?.total_penduduk || 0 }));
+        } catch (e) { console.error("Failed fetching dashboard", e); }
+
+        try {
+          const textRes = await api.get("/running-text");
+          if (textRes.data.status === "success") {
+            setRunningText(textRes.data.data.raw_admin || "");
+          }
+        } catch (e) { console.error("Failed fetching running-text", e); }
     };
     fetchStats();
   }, []);

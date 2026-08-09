@@ -28,18 +28,21 @@ function LoginForm() {
         password: password
       });
 
-      if (res.data.status === 'success') {
-        const { token, role, user } = res.data.data;
+        if (res.data.status === 'success') {
+        const { role, user, token } = res.data.data;
         
-        // Simpan ke localStorage
+        // Simpan data user ke localStorage
         localStorage.setItem("auth_token", token);
         localStorage.setItem("user_name", user.name);
         localStorage.setItem("user_role", role);
         localStorage.setItem("user_nik", user.email); // NIK tersimpan di kolom email
 
         // Redirect sesuai role
-        if (role === 'Super Admin') {
+        const adminRoles = ['Admin', 'Super Admin', 'Perangkat Desa', 'Staff'];
+        if (adminRoles.includes(role)) {
           router.push('/admin');
+        } else if (role === 'Kepala Desa') {
+          router.push('/kepaladesa');
         } else if (role === 'Warga') {
           router.push(searchParams.get("redirect") || '/warga');
         } else {

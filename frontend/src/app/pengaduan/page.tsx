@@ -12,8 +12,8 @@ export default function PengaduanPage() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
+    const role = localStorage.getItem("user_role");
+    if (!role) {
       router.push("/auth/login?redirect=/pengaduan");
     } else {
       setIsAuthChecking(false);

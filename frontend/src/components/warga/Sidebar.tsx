@@ -2,7 +2,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, FileText, MessageSquare, Home, LogOut } from "lucide-react";
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -18,6 +18,7 @@ export default function Sidebar() {
     localStorage.removeItem("user_name");
     localStorage.removeItem("user_role");
     localStorage.removeItem("user_nik");
+    onClose?.();
     window.location.href = "/auth/login";
   };
 
@@ -35,6 +36,7 @@ export default function Sidebar() {
             <Link 
               key={item.name} 
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 isActive 
                   ? "bg-primary-50 text-primary font-bold shadow-sm border border-primary/20" 

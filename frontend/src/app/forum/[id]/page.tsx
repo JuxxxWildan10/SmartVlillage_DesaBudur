@@ -18,9 +18,9 @@ export default function ForumDetailPage() {
   const [userNik, setUserNik] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const role = localStorage.getItem("user_role");
     const nik = localStorage.getItem("user_nik");
-    if (token) setIsAuth(true);
+    if (role) setIsAuth(true);
     if (nik) setUserNik(nik);
   }, []);
 
@@ -108,7 +108,7 @@ export default function ForumDetailPage() {
 
           <div className="flex flex-wrap items-center gap-5 text-sm text-gray-400 border-t border-gray-100 pt-4">
             <span className="flex items-center gap-2">
-              <Users size={15} /> Oleh: <strong className="text-gray-600">{topic.user_nik}</strong>
+              <Users size={15} /> Oleh: <strong className="text-gray-600">{topic.user_nik ? topic.user_nik.substring(0, 4) + "****" + topic.user_nik.substring(12) : "Anonim"}</strong>
             </span>
             <span className="flex items-center gap-2">
               <Clock size={15} /> {formatDate(topic.created_at)}
@@ -138,7 +138,7 @@ export default function ForumDetailPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-gray-900 text-sm">{reply.user_nik}</span>
+                      <span className="font-bold text-gray-900 text-sm">{reply.user_nik ? reply.user_nik.substring(0, 4) + "****" + reply.user_nik.substring(12) : "Anonim"}</span>
                       <span className="text-xs text-gray-400">{formatDate(reply.created_at)}</span>
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{reply.isi}</p>

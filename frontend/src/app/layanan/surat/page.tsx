@@ -26,8 +26,8 @@ export default function SuratPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) setIsAuth(true);
+    const role = localStorage.getItem("user_role");
+    if (role) setIsAuth(true);
 
     // Fetch jenis surat dari database
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/master-surat`)

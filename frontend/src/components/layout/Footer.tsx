@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="bg-secondary text-white pt-16 pb-8 border-t-[6px] border-primary">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          
+
           {/* Col 1 */}
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -24,9 +24,9 @@ export default function Footer() {
               Platform Smart Village Desa Budur mewujudkan tata kelola pemerintahan desa yang transparan, inovatif, dan responsif melalui digitalisasi pelayanan publik.
             </p>
             <div className="flex gap-4">
-              <SocialLink href="#" label="FB" />
-              <SocialLink href="#" label="IG" />
-              <SocialLink href="#" label="X" />
+              <SocialLink href="https://facebook.com/desabudur" label="FB" />
+              <SocialLink href="https://www.instagram.com/desa.budur?igsh=MXB5dWowaXV1anRjMQ==" label="IG" />
+              <SocialLink href="https://youtube.com/@desabudur?si=NijIagE1WzEv6LIT" label="YT" />
             </div>
           </div>
 
@@ -46,7 +46,7 @@ export default function Footer() {
           <div>
             <h4 className="font-heading font-bold text-lg mb-6 text-white">Transparansi</h4>
             <ul className="space-y-3">
-              <FooterLink href="/transparansi/apbdes" text="Infografis APBDes" />
+              <FooterLink href="/transparansi" text="Infografis APBDes" />
               <FooterLink href="/transparansi/pembangunan" text="Proyek Pembangunan" />
               <FooterLink href="/dokumen/perdes" text="Peraturan Desa" />
               <FooterLink href="/dokumen/rpjmdes" text="RPJMDes & RKPDes" />

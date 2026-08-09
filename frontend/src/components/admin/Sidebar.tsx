@@ -2,7 +2,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FileText, MessageSquare, Users, Store, Gift,
-  Megaphone, LogOut, Home, HeartPulse, Target, UserCog, TrendingUp, ScrollText, ChevronDown, ChevronRight
+  Megaphone, LogOut, Home, HeartPulse, Target, UserCog, TrendingUp, ScrollText, ChevronDown, ChevronRight, Building
 } from "lucide-react";
 import { useState } from "react";
 
@@ -13,11 +13,12 @@ interface MenuItem {
   children?: { name: string; href: string; icon: any }[];
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
 
-  const menu: MenuItem[] = [
+  const baseMenu: MenuItem[] = [
     { name: "Beranda Publik", icon: Home, href: "/" },
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
     { name: "Data Keluarga", icon: Users, href: "/admin/keluarga" },
@@ -35,10 +36,26 @@ export default function Sidebar() {
         { name: "Aparatur Desa", href: "/admin/aparatur", icon: UserCog },
         { name: "APBDes", href: "/admin/apbdes", icon: TrendingUp },
         { name: "Master Surat", href: "/admin/jenis-surat", icon: ScrollText },
+        { name: "Regulasi & Dokumen", href: "/admin/dokumen", icon: FileText },
+        { name: "Proyek Pembangunan", href: "/admin/pembangunan", icon: Building },
       ],
     },
     { name: "SDGs", icon: Target, href: "/admin/sdgs" },
   ];
+
+  let menu = baseMenu;
+  if (userRole === "Kepala Desa") {
+    menu = baseMenu.filter(item => ["Beranda Publik", "Dashboard", "UMKM", "Pemerintahan", "SDGs"].includes(item.name));
+    // Filter out aparatur and master surat for Kepala Desa
+    menu = menu.map(item => {
+      if (item.name === "Pemerintahan" && item.children) {
+        return { ...item, children: item.children.filter(child => child.name === "APBDes" || child.name === "Proyek Pembangunan") };
+      }
+      return item;
+    });
+  } else if (userRole === "Staff" || userRole === "Perangkat Desa") {
+    menu = baseMenu.filter(item => ["Beranda Publik", "Dashboard", "Kelola Surat", "Pengaduan"].includes(item.name));
+  }
 
   const isActive = (href: string) => pathname === href;
   const isGroupActive = (item: MenuItem) => item.children?.some(c => pathname === c.href) ?? false;
@@ -76,6 +93,7 @@ export default function Sidebar() {
                       <Link
                         key={child.href}
                         href={child.href}
+                        onClick={onClose}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm ${
                           isActive(child.href)
                             ? "bg-primary text-white shadow-md font-bold"
@@ -96,6 +114,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href!}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 isActive(item.href!)
                   ? "bg-primary text-white shadow-md font-bold"
@@ -116,6 +135,7 @@ export default function Sidebar() {
             localStorage.removeItem("user_name");
             localStorage.removeItem("user_nik");
             localStorage.removeItem("user_role");
+            onClose?.();
             window.location.href = "/auth/login";
           }}
           className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 transition-colors"

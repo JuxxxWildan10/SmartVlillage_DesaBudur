@@ -10,7 +10,7 @@ class PosyanduController extends Controller
 {
     public function index()
     {
-        $jadwal = Posyandu::orderBy('tanggal_waktu', 'asc')->get();
+        $jadwal = Posyandu::orderBy('nama', 'asc')->get();
         return response()->json(['status' => 'success', 'data' => $jadwal]);
     }
 

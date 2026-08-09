@@ -59,6 +59,6 @@ return [
      * Credentials harus false untuk API token-based auth (Sanctum Bearer token).
      * Hanya aktifkan jika menggunakan cookie-based auth (SPA session).
      */
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];

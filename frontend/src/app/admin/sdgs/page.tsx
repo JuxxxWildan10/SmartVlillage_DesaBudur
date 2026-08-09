@@ -17,9 +17,9 @@ export default function AdminSdgs() {
 
   const fetch = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/sdgs`);
       if (res.data.status === "success") {
-        setScores(res.data.data.sdgs_scores || []);
+        setScores(res.data.data || []);
       }
     } catch { toast.error("Gagal memuat data SDGs."); }
     finally { setLoading(false); }
@@ -38,12 +38,12 @@ export default function AdminSdgs() {
       return;
     }
     try {
-      // Find score ID from dashboard data
-      // We update via goal_number since we don't have direct score ID from dashboard
-      // Fallback: show message to use direct DB
-      toast.success(`Skor SDG ${editItem.goal_number} diperbarui menjadi ${scoreVal}.`);
-      setScores(prev => prev.map(s => s.goal_number === editItem.goal_number ? {...s, score: scoreVal} : s));
-      setEditItem(null);
+      const response = await api.put(`/sdgs/${editItem.id}`, { score: scoreVal });
+      if (response.data.status === "success") {
+        toast.success(`Skor SDG ${editItem.goal_number} diperbarui menjadi ${scoreVal}.`);
+        setScores(prev => prev.map(s => s.id === editItem.id ? {...s, score: scoreVal} : s));
+        setEditItem(null);
+      }
     } catch { toast.error("Gagal menyimpan skor."); }
   };
 

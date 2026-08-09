@@ -24,7 +24,15 @@ class BansosController extends Controller
 
     public function store(Request $request)
     {
-        $program = BansosProgram::create($request->except(['id', 'created_at', 'updated_at']));
+        $validated = $request->validate([
+            'nama_program' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'penyelenggara' => 'required|string|max:255',
+            'tahun' => 'required|integer',
+            'status' => 'nullable|string|in:Aktif,Selesai'
+        ]);
+
+        $program = BansosProgram::create($validated);
         return response()->json([
             'status' => 'success',
             'data' => $program
@@ -36,7 +44,15 @@ class BansosController extends Controller
         $program = BansosProgram::find($id);
         if (!$program) return response()->json(['status' => 'error'], 404);
 
-        $program->update($request->except(['id', 'created_at', 'updated_at']));
+        $validated = $request->validate([
+            'nama_program' => 'sometimes|required|string|max:255',
+            'deskripsi' => 'sometimes|required|string',
+            'penyelenggara' => 'sometimes|required|string|max:255',
+            'tahun' => 'sometimes|required|integer',
+            'status' => 'nullable|string|in:Aktif,Selesai'
+        ]);
+
+        $program->update($validated);
 
         return response()->json([
             'status' => 'success',

@@ -14,11 +14,13 @@ export default function AdminAparatur() {
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
+  const [file, setFile] = useState<File | null>(null);
 
   const fetch = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/aparatur");
+      // Gunakan ?all=true agar admin bisa melihat semua aparatur (aktif & non-aktif)
+      const res = await api.get("/aparatur?all=true");
       setList(res.data.data || []);
     } catch { toast.error("Gagal memuat data aparatur."); }
     finally { setLoading(false); }
@@ -26,21 +28,36 @@ export default function AdminAparatur() {
 
   useEffect(() => { fetch(); }, []);
 
-  const openCreate = () => { setEditId(null); setForm({ ...emptyForm }); setModal(true); };
+  const openCreate = () => { setEditId(null); setForm({ ...emptyForm }); setFile(null); setModal(true); };
   const openEdit = (item: any) => {
     setEditId(item.id);
     setForm({ nama_lengkap: item.nama_lengkap, jabatan: item.jabatan, niap: item.niap || "", status: item.status });
+    setFile(null);
     setModal(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append("nama_lengkap", form.nama_lengkap);
+      formData.append("jabatan", form.jabatan);
+      formData.append("niap", form.niap);
+      formData.append("status", form.status);
+      if (file) {
+        formData.append("foto", file);
+      }
+
       if (editId) {
-        await api.put(`/aparatur/${editId}`, form);
+        formData.append("_method", "PUT");
+        await api.post(`/aparatur/${editId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
         toast.success("Data aparatur diperbarui.");
       } else {
-        await api.post("/aparatur", form);
+        await api.post("/aparatur", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
         toast.success("Aparatur berhasil ditambahkan.");
       }
       setModal(false);
@@ -92,9 +109,15 @@ export default function AdminAparatur() {
                   <td className="px-6 py-4 text-gray-500 font-medium">{idx + 1}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-bold text-sm shrink-0">
-                        {item.nama_lengkap.charAt(0)}
-                      </div>
+                      {item.foto ? (
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                          <img src={item.foto.startsWith("http") ? item.foto : `${process.env.NEXT_PUBLIC_BASE_URL}${item.foto}`} alt={item.nama_lengkap} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-bold text-sm shrink-0 border border-primary/20">
+                          {item.nama_lengkap.charAt(0)}
+                        </div>
+                      )}
                       <span className="font-semibold text-gray-900">{item.nama_lengkap}</span>
                     </div>
                   </td>
@@ -144,6 +167,10 @@ export default function AdminAparatur() {
                   <option>Aktif</option>
                   <option>Non-Aktif</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Foto (Opsional)</label>
+                <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer outline-none transition-colors bg-white border border-gray-200" />
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50">Batal</button>

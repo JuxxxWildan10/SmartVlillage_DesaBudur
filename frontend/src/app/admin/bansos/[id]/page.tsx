@@ -25,10 +25,6 @@ export default function DetailBansos({ params }: { params: Promise<{ id: string 
   const [formData, setFormData] = useState({ id: null, keluarga_id: "", status_penerimaan: "Layak", keterangan: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const [progRes, penRes, kelRes] = await Promise.all([
@@ -49,6 +45,11 @@ export default function DetailBansos({ params }: { params: Promise<{ id: string 
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
 
   const handleOpenModal = (mode: "create" | "edit", data: any = null) => {
     setModalMode(mode);

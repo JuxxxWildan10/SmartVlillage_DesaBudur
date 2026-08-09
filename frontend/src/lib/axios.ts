@@ -4,14 +4,15 @@ import axios from "axios";
  * Konfigurasi Axios — API Client Web Desa Budur
  *
  * Keamanan:
- * - Token disimpan di localStorage (untuk SPA). Alternatif: httpOnly cookie (perlu konfigurasi backend).
- * - Semua request menyertakan Authorization header secara otomatis.
+ * - Menggunakan Sanctum SPA Cookie Auth (HttpOnly Cookie).
+ * - Cookie dikelola otomatis oleh browser dan backend.
  * - Response 401 otomatis redirect ke halaman login dan bersihkan semua data auth.
  * - Timeout 30 detik untuk mencegah request menggantung.
  */
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 30000, // 30 detik timeout — mencegah request menggantung
+  timeout: 60000, // 60 detik timeout — menyesuaikan dengan koneksi database remote (Supabase)
+  withCredentials: true, // WAJIB untuk mengirim/menerima session cookie (Sanctum)
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -20,26 +21,15 @@ const api = axios.create({
 });
 
 // ── Request Interceptor ─────────────────────────────────────────────
-// Tambahkan token auth ke setiap request secara otomatis
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        // Validasi format token dasar sebelum dikirim (mencegah inject header aneh)
-        if (/^[a-zA-Z0-9|]+$/.test(token)) {
-          config.headers["Authorization"] = `Bearer ${token}`;
-        } else {
-          // Token corrupt — hapus dan minta login ulang
-          clearAuthData();
-        }
-      }
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
+  }
+  return config;
+});
 // ── Response Interceptor ────────────────────────────────────────────
 // Handle error response secara terpusat
 api.interceptors.response.use(

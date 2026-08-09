@@ -18,8 +18,8 @@ export default function AdminJenisSurat() {
   const fetch = async () => {
     setLoading(true);
     try {
-      // Fetch all including inactive for admin
-      const res = await api.get("/master-surat");
+      // Gunakan ?all=true agar admin bisa melihat semua jenis surat (aktif & non-aktif)
+      const res = await api.get("/master-surat?all=true");
       setList(res.data.data || []);
     } catch { toast.error("Gagal memuat data."); }
     finally { setLoading(false); }

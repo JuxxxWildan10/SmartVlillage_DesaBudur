@@ -10,8 +10,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
   const isWarga = pathname?.startsWith("/warga");
+  const isKepalaDesa = pathname?.startsWith("/kepaladesa");
 
-  if (isAdmin || isWarga) {
+  if (isAdmin || isWarga || isKepalaDesa) {
     return <>{children}</>;
   }
 

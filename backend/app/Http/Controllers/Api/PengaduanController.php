@@ -113,6 +113,9 @@ class PengaduanController extends Controller
 
         $pengaduan->update($updateData);
 
+        // Dispatch realtime event
+        event(new \App\Events\PengaduanStatusUpdated($pengaduan->load('penduduk:id,nama_lengkap,nik')));
+
         return response()->json([
             'status' => 'success',
             'message' => 'Pengaduan diperbarui',

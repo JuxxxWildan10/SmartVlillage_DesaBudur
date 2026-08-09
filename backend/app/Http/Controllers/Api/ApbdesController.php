@@ -26,16 +26,16 @@ class ApbdesController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'tahun' => 'required|integer',
             'jenis' => 'required|in:Pendapatan,Belanja,Pembiayaan',
-            'bidang' => 'required|string',
-            'uraian' => 'required|string',
-            'anggaran' => 'required|numeric',
-            'realisasi' => 'nullable|numeric',
+            'bidang' => 'required|string|max:255',
+            'uraian' => 'required|string|max:255',
+            'anggaran' => 'required|numeric|min:0',
+            'realisasi' => 'nullable|numeric|min:0',
         ]);
 
-        $item = ApbdesAnggaran::create($request->except(['id', 'created_at', 'updated_at']));
+        $item = ApbdesAnggaran::create($validated);
         return response()->json(['status' => 'success', 'data' => $item], 201);
     }
 
@@ -44,7 +44,16 @@ class ApbdesController extends Controller
         $item = ApbdesAnggaran::find($id);
         if (!$item) return response()->json(['status' => 'error'], 404);
 
-        $item->update($request->except(['id', 'created_at', 'updated_at']));
+        $validated = $request->validate([
+            'tahun' => 'sometimes|required|integer',
+            'jenis' => 'sometimes|required|in:Pendapatan,Belanja,Pembiayaan',
+            'bidang' => 'sometimes|required|string|max:255',
+            'uraian' => 'sometimes|required|string|max:255',
+            'anggaran' => 'sometimes|required|numeric|min:0',
+            'realisasi' => 'nullable|numeric|min:0',
+        ]);
+
+        $item->update($validated);
         return response()->json(['status' => 'success', 'data' => $item]);
     }
 

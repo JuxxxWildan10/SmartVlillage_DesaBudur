@@ -8,9 +8,13 @@ import Link from "next/link";
 export default function WargaDashboard() {
   const [stats, setStats] = useState({ surat: 0, pengaduan: 0, suratSelesai: 0 });
   const [loading, setLoading] = useState(true);
-  const userName = typeof window !== "undefined" ? localStorage.getItem("user_name") : "";
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
+    // Baca localStorage hanya setelah komponen mount (client-side only)
+    const name = localStorage.getItem("user_name");
+    if (name) setUserName(name);
+
     const fetchStats = async () => {
       try {
         const [suratRes, pengaduanRes] = await Promise.all([

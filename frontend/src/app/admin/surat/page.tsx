@@ -155,6 +155,7 @@ export default function AdminSurat() {
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
                         surat.status === 'Menunggu' ? 'bg-orange-100 text-orange-700' :
+                        surat.status === 'Diproses' ? 'bg-blue-100 text-blue-700' :
                         surat.status === 'Selesai' ? 'bg-green-100 text-green-700' :
                         'bg-red-100 text-red-700'
                       }`}>
@@ -196,7 +197,7 @@ export default function AdminSurat() {
                             <MessageCircle size={18} />
                           </button>
                           <a 
-                            href={`${process.env.NEXT_PUBLIC_API_URL}/surat/${surat.id}/pdf`}
+                            href={`${process.env.NEXT_PUBLIC_API_URL}/surat/${surat.tracking_code}/pdf`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors inline-block" 

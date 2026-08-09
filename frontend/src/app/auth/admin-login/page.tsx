@@ -21,16 +21,22 @@ export default function AdminLoginPage() {
       const res = await api.post("/login", { email, password });
       const data = res.data.data;
       
+      // Simpan token, role, dan data user ke localStorage
       localStorage.setItem("auth_token", data.token);
       localStorage.setItem("user_role", data.role);
+      localStorage.setItem("user_name", data.user.name);
+      localStorage.setItem("user_nik", data.user.email);
       
-      if (data.role === "Admin" || data.role === "Perangkat Desa" || data.role === "Super Admin") {
+      if (data.role === "Kepala Desa") {
+        router.push("/kepaladesa");
+      } else if (data.role === "Admin" || data.role === "Perangkat Desa" || data.role === "Super Admin" || data.role === "Staff") {
         router.push("/admin");
       } else {
         setErrorModal({ show: true, message: "Akses ditolak. Halaman ini khusus Perangkat Desa." });
       }
     } catch (err: any) {
-      setErrorModal({ show: true, message: "Email atau Password salah! Akses ditolak." });
+      console.error(err);
+      setErrorModal({ show: true, message: err.response?.data?.message || "Email atau Password salah! Akses ditolak." });
     } finally {
       setLoading(false);
     }

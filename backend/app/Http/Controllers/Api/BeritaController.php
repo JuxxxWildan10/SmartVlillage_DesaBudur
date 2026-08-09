@@ -35,14 +35,19 @@ class BeritaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'judul' => 'required',
-            'kategori' => 'required',
-            'isi_berita' => 'required',
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'kategori' => 'required|string|max:255',
+            'isi_berita' => 'required|string',
+            'status' => 'nullable|string|in:Published,Draft',
             'gambar_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->except('gambar_url_file');
+        $data = $request->only(['judul', 'kategori', 'isi_berita', 'status']);
+        if (isset($data['judul'])) $data['judul'] = strip_tags($data['judul']);
+        if (isset($data['kategori'])) $data['kategori'] = strip_tags($data['kategori']);
+        if (!isset($data['status'])) $data['status'] = 'Published'; // default status
+
         if ($request->hasFile('gambar_url')) {
             $path = $request->file('gambar_url')->store('berita', 'public');
             $data['gambar_url'] = '/api/berita/image/' . basename($path);
@@ -61,11 +66,17 @@ class BeritaController extends Controller
         $berita = Berita::find($id);
         if (!$berita) return response()->json(['status' => 'error'], 404);
 
-        $request->validate([
+        $validated = $request->validate([
+            'judul' => 'sometimes|required|string|max:255',
+            'kategori' => 'sometimes|required|string|max:255',
+            'isi_berita' => 'sometimes|required|string',
             'gambar_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->except('gambar_url_file');
+        $data = $request->only(['judul', 'kategori', 'isi_berita', 'status']);
+        if (isset($data['judul'])) $data['judul'] = strip_tags($data['judul']);
+        if (isset($data['kategori'])) $data['kategori'] = strip_tags($data['kategori']);
+
         if ($request->hasFile('gambar_url')) {
             $path = $request->file('gambar_url')->store('berita', 'public');
             $data['gambar_url'] = '/api/berita/image/' . basename($path);

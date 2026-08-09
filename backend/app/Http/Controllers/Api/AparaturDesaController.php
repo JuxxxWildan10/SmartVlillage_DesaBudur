@@ -8,21 +8,31 @@ use App\Models\AparaturDesa;
 
 class AparaturDesaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $aparatur = AparaturDesa::where('status', 'Aktif')->orderBy('id')->get();
+        // ?all=true digunakan oleh admin panel untuk melihat semua (aktif & non-aktif)
+        if ($request->query('all') === 'true') {
+            $aparatur = AparaturDesa::orderBy('id')->get();
+        } else {
+            // Default: hanya tampilkan aparatur aktif (untuk halaman publik profil desa)
+            $aparatur = AparaturDesa::where('status', 'Aktif')->orderBy('id')->get();
+        }
         return response()->json(['status' => 'success', 'data' => $aparatur]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_lengkap' => 'required|string',
-            'jabatan' => 'required|string',
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
+            'niap' => 'nullable|string|max:100',
+            'status' => 'nullable|string|in:Aktif,Non-Aktif',
+            'penduduk_id' => 'nullable|exists:penduduk,id',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->except('foto');
+        $data = $request->only(['nama_lengkap', 'jabatan', 'niap', 'status', 'penduduk_id']);
+        
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('aparatur', 'public');
             $data['foto'] = '/api/aparatur/image/' . basename($path);
@@ -37,10 +47,16 @@ class AparaturDesaController extends Controller
         $aparatur = AparaturDesa::find($id);
         if (!$aparatur) return response()->json(['status' => 'error', 'message' => 'Tidak ditemukan'], 404);
 
-        $data = $request->except('foto');
-        $request->validate([
+        $validated = $request->validate([
+            'nama_lengkap' => 'sometimes|required|string|max:255',
+            'jabatan' => 'sometimes|required|string|max:255',
+            'niap' => 'nullable|string|max:100',
+            'status' => 'nullable|string|in:Aktif,Non-Aktif',
+            'penduduk_id' => 'nullable|exists:penduduk,id',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        $data = $request->only(['nama_lengkap', 'jabatan', 'niap', 'status', 'penduduk_id']);
 
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('aparatur', 'public');

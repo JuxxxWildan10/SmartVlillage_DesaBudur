@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from "@/components/layout/Navbar";
 import axios from "axios";
-import { Users, History, Target, ShieldCheck } from "lucide-react";
+import { Users, History, Target, ShieldCheck, User } from "lucide-react";
 
 
 export default function ProfilDesa() {
@@ -52,9 +52,9 @@ export default function ProfilDesa() {
               </p>
             </div>
             <div className="flex-1 w-full relative">
-              <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden shadow-lg border-4 border-white relative group">
-                <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-all duration-500"></div>
-                <img src="https://images.unsplash.com/photo-1596423735880-5c621434c9c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Pemandangan Desa" className="w-full h-full object-cover" />
+              <div className="aspect-square max-w-sm mx-auto bg-white rounded-2xl overflow-hidden shadow-lg border-4 border-white relative group flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-all duration-500"></div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Coat_of_arms_of_Cirebon_Regency.svg/1200px-Coat_of_arms_of_Cirebon_Regency.svg.png" alt="Logo Kabupaten Cirebon" className="w-full h-full object-contain drop-shadow-md relative z-10" />
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function ProfilDesa() {
             </div>
             <h3 className="text-2xl font-bold font-heading text-gray-900 mb-4">Visi</h3>
             <p className="text-gray-600 text-lg leading-relaxed">
-              "Terwujudnya Desa Budur yang Mandiri, Sejahtera, Cerdas, dan Berbudaya melalui Tata Kelola Pemerintahan yang Bersih dan Inovatif."
+              &quot;Terwujudnya Desa Budur yang Mandiri, Sejahtera, Cerdas, dan Berbudaya melalui Tata Kelola Pemerintahan yang Bersih dan Inovatif.&quot;
             </p>
           </div>
 
@@ -113,14 +113,16 @@ export default function ProfilDesa() {
           ) : (
             aparaturList.map((person: any, idx: number) => (
               <div key={person.id || idx} className="bg-white p-6 rounded-2xl text-center shadow-sm border border-gray-100 hover:-translate-y-2 transition-transform">
-                <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
-                  <img
-                    src={person.foto
-                      ? `${process.env.NEXT_PUBLIC_BASE_URL}${person.foto}`
-                      : `https://api.dicebear.com/7.x/avataaars/svg?seed=${person.nama_lengkap}`}
-                    alt={person.nama_lengkap}
-                    className="w-full h-full object-cover bg-gray-100"
-                  />
+                <div className="w-20 h-20 bg-gray-50 rounded-full mx-auto mb-4 overflow-hidden flex items-center justify-center border-2 border-gray-100">
+                  {person.foto ? (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_BASE_URL}${person.foto}`}
+                      alt={person.nama_lengkap}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 text-gray-300" />
+                  )}
                 </div>
                 <h4 className="font-bold text-gray-900">{person.nama_lengkap}</h4>
                 <p className="text-sm text-primary font-medium">{person.jabatan}</p>

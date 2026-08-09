@@ -17,11 +17,11 @@ export default function Navbar() {
   const isHome = pathname === "/";
 
   useEffect(() => {
-    // Check Auth Status
-    const token = localStorage.getItem("auth_token");
-    if (token) {
+    // Check Auth Status (SPA Cookie Auth relies on user_role flag in localStorage for UI state)
+    const role = localStorage.getItem("user_role");
+    if (role) {
       setIsAuth(true);
-      setUserRole(localStorage.getItem("user_role") || "Warga");
+      setUserRole(role);
     }
 
     const handleScroll = () => {
@@ -34,6 +34,17 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   const handleLogoClick = () => {
     const newCount = clickCount + 1;
@@ -58,8 +69,8 @@ export default function Navbar() {
         
         {/* Logo */}
         <div onClick={handleLogoClick} className="cursor-pointer flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-white rounded-full flex-center p-1 overflow-hidden shadow-lg shadow-black/20 group-hover:rotate-12 transition-all">
-            <Leaf className="text-primary w-full h-full" />
+          <div className="w-10 h-10 bg-white flex items-center justify-center p-1 overflow-hidden shadow-lg shadow-black/20 group-hover:rotate-12 transition-all rounded-md">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Coat_of_arms_of_Cirebon_Regency.svg/1200px-Coat_of_arms_of_Cirebon_Regency.svg.png" alt="Logo Cirebon" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className={`font-heading font-bold text-lg leading-tight ${scrolled ? 'text-white' : 'text-white drop-shadow-md'}`}>
@@ -74,8 +85,11 @@ export default function Navbar() {
           <NavLinks scrolled={scrolled} />
           
           {isAuth ? (
-            <Link href={userRole === 'Super Admin' ? '/admin' : '/warga'} className="bg-gold hover:bg-gold-light text-primary-dark font-bold px-6 py-2.5 rounded-full transition-all shadow-md flex items-center gap-2">
-              <User size={18} /> Dashboard {userRole === 'Super Admin' ? 'Admin' : 'Warga'}
+            <Link 
+              href={userRole === 'Kepala Desa' ? '/kepaladesa' : (['Admin', 'Super Admin', 'Perangkat Desa', 'Staff'].includes(userRole) ? '/admin' : '/warga')} 
+              className="bg-gold hover:bg-gold-light text-primary-dark font-bold px-6 py-2.5 rounded-full transition-all shadow-md flex items-center gap-2"
+            >
+              <User size={18} /> Dashboard {['Admin', 'Super Admin', 'Perangkat Desa', 'Staff'].includes(userRole) ? 'Admin' : (userRole === 'Kepala Desa' ? 'Kepala Desa' : 'Warga')}
             </Link>
           ) : (
             <Link href="/auth/login" className="bg-gold hover:bg-gold-light text-primary-dark font-bold px-6 py-2.5 rounded-full transition-all shadow-md flex items-center gap-2">
@@ -95,15 +109,19 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-primary shadow-xl border-t border-white/10">
+        <div className="lg:hidden absolute top-full left-0 w-full bg-primary shadow-xl border-t border-white/10 max-h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar pb-6">
           <div className="flex flex-col p-4">
             <NavLinks scrolled={true} mobile closeMenu={() => setMobileMenuOpen(false)} />
             {isAuth ? (
-              <Link href={userRole === 'Super Admin' ? '/admin' : '/warga'} onClick={() => setMobileMenuOpen(false)} className="mt-4 bg-gold text-primary-dark font-bold px-6 py-3 rounded-xl text-center flex-center gap-2">
+              <Link 
+                href={userRole === 'Kepala Desa' ? '/kepaladesa' : (['Admin', 'Super Admin', 'Perangkat Desa', 'Staff'].includes(userRole) ? '/admin' : '/warga')} 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="mt-4 bg-gold text-primary-dark font-bold px-6 py-3 rounded-xl text-center flex items-center justify-center gap-2"
+              >
                 <User size={18} /> Dashboard
               </Link>
             ) : (
-              <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="mt-4 bg-gold text-primary-dark font-bold px-6 py-3 rounded-xl text-center flex-center gap-2">
+              <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="mt-4 bg-gold text-primary-dark font-bold px-6 py-3 rounded-xl text-center flex items-center justify-center gap-2">
                 <User size={18} /> Masuk Akun
               </Link>
             )}

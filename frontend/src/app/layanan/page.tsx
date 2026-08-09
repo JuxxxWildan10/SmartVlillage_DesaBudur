@@ -84,8 +84,8 @@ export default function LayananPage() {
 
   const handleLayanan = (item: typeof layananList[0]) => {
     if (item.requiresAuth) {
-      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-      if (!token) {
+      const role = typeof window !== "undefined" ? localStorage.getItem("user_role") : null;
+      if (!role) {
         router.push(`/auth/login?redirect=${item.href}`);
         return;
       }

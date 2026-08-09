@@ -6,7 +6,7 @@ import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
-const emptyForm = { nama: "", lokasi: "", jadwal: "", ketua_kader: "", jumlah_balita: "" };
+const emptyForm = { nama: "", lokasi: "", jadwal: "", ketua_kader: "" };
 
 export default function AdminPosyandu() {
   const [list, setList] = useState<any[]>([]);
@@ -26,7 +26,7 @@ export default function AdminPosyandu() {
   useEffect(() => { fetch(); }, []);
 
   const openCreate = () => { setEditId(null); setForm({ ...emptyForm }); setModal(true); };
-  const openEdit = (item: any) => { setEditId(item.id); setForm({ nama: item.nama, lokasi: item.lokasi, jadwal: item.jadwal, ketua_kader: item.ketua_kader || "", jumlah_balita: item.jumlah_balita || "" }); setModal(true); };
+  const openEdit = (item: any) => { setEditId(item.id); setForm({ nama: item.nama, lokasi: item.lokasi, jadwal: item.jadwal, ketua_kader: item.ketua_kader || "" }); setModal(true); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

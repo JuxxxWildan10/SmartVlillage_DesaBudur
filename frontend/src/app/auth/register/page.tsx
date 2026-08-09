@@ -19,10 +19,13 @@ export default function RegisterPage() {
     setError("");
 
     try {
+      // Ambil CSRF Cookie terlebih dahulu (Sanctum SPA Auth)
+      await api.get("/sanctum/csrf-cookie");
+
       const res = await api.post("/register", formData);
       const data = res.data.data;
       
-      localStorage.setItem("auth_token", data.token);
+      // Token dikelola via HttpOnly Cookie
       localStorage.setItem("user_role", data.role);
       localStorage.setItem("user_name", data.user?.name || formData.name);
       localStorage.setItem("user_nik", formData.nik);

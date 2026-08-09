@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { BookOpen, Calendar, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 export default function ArtikelPage() {
   const [artikel, setArtikel] = useState<any[]>([]);
@@ -13,8 +14,9 @@ export default function ArtikelPage() {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/berita`)
       .then(res => {
         if (res.data.status === "success") {
-          // We can optionally filter if there are categories. For now, we show all.
-          setArtikel(res.data.data);
+          // Hanya tampilkan berita Published di halaman artikel publik
+          const published = res.data.data.filter((b: any) => b.status === "Published");
+          setArtikel(published);
         }
       })
       .catch(err => console.error(err))
@@ -71,9 +73,9 @@ export default function ArtikelPage() {
                   <p className="text-gray-600 mb-6 line-clamp-3 flex-1 text-sm">
                     {item.isi_berita}
                   </p>
-                  <button className="flex items-center gap-2 text-primary font-bold text-sm hover:text-primary-dark transition-colors">
+                  <Link href={`/artikel/${item.id}`} className="inline-flex items-center gap-2 text-primary font-bold text-sm hover:text-primary-dark transition-colors">
                     Baca Selengkapnya <ChevronRight size={16} />
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}

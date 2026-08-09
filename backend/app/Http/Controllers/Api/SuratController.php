@@ -100,7 +100,11 @@ class SuratController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Surat tidak ditemukan'], 404);
         }
 
-        $updateData = ['status' => $request->status];
+        $validated = $request->validate([
+            'status' => 'required|string|in:Menunggu,Diproses,Selesai,Ditolak'
+        ]);
+
+        $updateData = ['status' => $validated['status']];
 
         // Generate nomor surat otomatis saat disetujui
         if ($request->status === 'Selesai' && empty($surat->nomor_surat)) {
@@ -109,6 +113,9 @@ class SuratController extends Controller
         }
 
         $surat->update($updateData);
+
+        // Dispatch realtime event
+        event(new \App\Events\SuratStatusUpdated($surat->load('penduduk:id,nama_lengkap,nik')));
 
         return response()->json([
             'status' => 'success',

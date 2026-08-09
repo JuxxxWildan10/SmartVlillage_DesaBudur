@@ -19,13 +19,30 @@ export default function ChatbotWidget() {
     setMessages(newMessages);
     setInput("");
 
-    // Mock bot reply
+    // Rule-based intent matching
+    const lowerInput = input.toLowerCase();
+    let reply = "Maaf, saya tidak mengerti pertanyaan tersebut. Coba tanyakan tentang 'surat', 'ktp', 'pengaduan', atau 'jam kerja'.";
+
+    if (lowerInput.includes("surat") || lowerInput.includes("dokumen")) {
+      reply = "Untuk membuat surat secara online, Anda bisa masuk (login) ke Portal Layanan Warga lalu pilih menu e-Surat. Terdapat berbagai jenis surat seperti Keterangan Usaha, Domisili, dll.";
+    } else if (lowerInput.includes("ktp") || lowerInput.includes("kk") || lowerInput.includes("kartu keluarga")) {
+      reply = "Untuk pengurusan KTP atau KK, pastikan Anda membawa surat pengantar dari RT/RW setempat ke Balai Desa, lalu admin akan memprosesnya ke Disdukcapil.";
+    } else if (lowerInput.includes("pengaduan") || lowerInput.includes("lapor") || lowerInput.includes("masalah")) {
+      reply = "Anda dapat melaporkan masalah infrastruktur atau keamanan melalui menu 'Pengaduan' di Dashboard Warga. Admin akan menindaklanjutinya secepat mungkin.";
+    } else if (lowerInput.includes("jam kerja") || lowerInput.includes("buka") || lowerInput.includes("operasional")) {
+      reply = "Balai Desa Budur buka dari hari Senin s/d Jumat, pukul 08:00 hingga 15:00 WIB. Hari Sabtu dan Minggu tutup.";
+    } else if (lowerInput.includes("halo") || lowerInput.includes("hi") || lowerInput.includes("pagi") || lowerInput.includes("siang")) {
+      reply = "Halo! Silakan ketik pertanyaan Anda seputar layanan Desa Budur.";
+    } else if (lowerInput.includes("terima kasih") || lowerInput.includes("makasih")) {
+      reply = "Sama-sama! Senang bisa membantu Anda.";
+    }
+
     setTimeout(() => {
       setMessages(prev => [
         ...prev, 
-        { sender: "bot", text: "Terima kasih atas pesan Anda. Saat ini integrasi AI sedang dalam pengembangan tahap akhir. Silakan kunjungi menu Layanan untuk fitur e-Surat." }
+        { sender: "bot", text: reply }
       ]);
-    }, 1000);
+    }, 600);
   };
 
   return (

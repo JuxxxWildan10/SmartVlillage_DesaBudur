@@ -8,20 +8,29 @@ use App\Models\MasterJenisSurat;
 
 class MasterJenisSuratController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jenis = MasterJenisSurat::where('is_active', true)->orderBy('nama_surat')->get();
+        // Query param ?all=true digunakan oleh admin panel untuk melihat semua jenis surat (aktif & non-aktif)
+        if ($request->query('all') === 'true') {
+            $jenis = MasterJenisSurat::orderBy('nama_surat')->get();
+        } else {
+            // Default: hanya tampilkan yang aktif (untuk form pengajuan warga)
+            $jenis = MasterJenisSurat::where('is_active', true)->orderBy('nama_surat')->get();
+        }
         return response()->json(['status' => 'success', 'data' => $jenis]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'kode_surat' => 'required|string|max:10|unique:master_jenis_surat,kode_surat',
-            'nama_surat' => 'required|string',
+            'nama_surat' => 'required|string|max:255',
+            'template_rtf' => 'nullable|string',
+            'persyaratan' => 'nullable|string',
+            'is_active' => 'nullable|boolean'
         ]);
 
-        $jenis = MasterJenisSurat::create($request->except(['id', 'created_at', 'updated_at']));
+        $jenis = MasterJenisSurat::create($validated);
         return response()->json(['status' => 'success', 'data' => $jenis], 201);
     }
 
@@ -30,7 +39,15 @@ class MasterJenisSuratController extends Controller
         $jenis = MasterJenisSurat::find($id);
         if (!$jenis) return response()->json(['status' => 'error', 'message' => 'Tidak ditemukan'], 404);
 
-        $jenis->update($request->except(['id', 'created_at', 'updated_at']));
+        $validated = $request->validate([
+            'kode_surat' => 'sometimes|required|string|max:10|unique:master_jenis_surat,kode_surat,'.$id,
+            'nama_surat' => 'sometimes|required|string|max:255',
+            'template_rtf' => 'nullable|string',
+            'persyaratan' => 'nullable|string',
+            'is_active' => 'nullable|boolean'
+        ]);
+
+        $jenis->update($validated);
         return response()->json(['status' => 'success', 'data' => $jenis]);
     }
 

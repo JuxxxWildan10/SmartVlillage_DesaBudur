@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { MessageSquare, Send, Eye, Users, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function ForumPage() {
   const router = useRouter();
@@ -11,17 +13,20 @@ export default function ForumPage() {
   const [loading, setLoading] = useState(true);
   const [isAuth, setIsAuth] = useState(false);
   const [newTopic, setNewTopic] = useState({ judul: "", isi: "" });
+  const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) setIsAuth(true);
+    const role = localStorage.getItem("user_role");
+    if (role) setIsAuth(true);
 
     const fetchTopics = async () => {
       try {
-        const res = await api.get("/forum");
+        // Forum adalah public endpoint — gunakan axios biasa, bukan authenticated api client
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/forum`);
         setTopics(res.data.data);
       } catch (err) {
         console.error(err);
+        toast.error("Gagal memuat topik forum.");
       } finally {
         setLoading(false);
       }
@@ -32,16 +37,20 @@ export default function ForumPage() {
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuth) {
-      alert("Harap login terlebih dahulu untuk memposting di forum!");
+      toast.error("Harap login terlebih dahulu untuk memposting di forum!");
       router.push("/auth/login");
       return;
     }
+    setPosting(true);
     try {
       const res = await api.post("/forum", newTopic);
       setTopics([res.data.data, ...topics]);
       setNewTopic({ judul: "", isi: "" });
+      toast.success("Topik berhasil diposting!");
     } catch (err) {
-      alert("Gagal memposting topik.");
+      toast.error("Gagal memposting topik. Coba lagi.");
+    } finally {
+      setPosting(false);
     }
   };
 
@@ -83,8 +92,8 @@ export default function ForumPage() {
                 className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 mb-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all h-24 resize-none"
               ></textarea>
               <div className="flex justify-end">
-                <button type="submit" className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all">
-                  <Send size={18} /> Posting Topik
+                <button type="submit" disabled={posting} className="bg-primary hover:bg-primary-dark disabled:opacity-70 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all">
+                  {posting ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} />} {posting ? "Memposting..." : "Posting Topik"}
                 </button>
               </div>
             </form>
@@ -124,7 +133,7 @@ export default function ForumPage() {
                 <div className="flex items-center gap-6 text-sm text-gray-500 border-t border-gray-50 pt-4">
                   <div className="flex items-center gap-2">
                     <Users size={16} />
-                    <span>{topic.user_nik}</span>
+                    <span>{topic.user_nik ? topic.user_nik.substring(0, 4) + "****" + topic.user_nik.substring(12) : "Anonim"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye size={16} />
