@@ -225,6 +225,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/penduduk', [PendudukController::class, 'store']);
         Route::put('/penduduk/{id}', [PendudukController::class, 'update']);
         Route::delete('/penduduk/{id}', [PendudukController::class, 'destroy']);
+        Route::post('/penduduk/{id}/reset-password', [PendudukController::class, 'resetPassword']);
 
         // Kelola Keluarga
         Route::get('/keluarga', [KeluargaController::class, 'index']);

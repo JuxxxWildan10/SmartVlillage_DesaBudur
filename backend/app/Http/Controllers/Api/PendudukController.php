@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Penduduk;
+use App\Models\User;
 
 class PendudukController extends Controller
 {
@@ -186,5 +188,34 @@ class PendudukController extends Controller
         if ($penduduk) $penduduk->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function resetPassword($id)
+    {
+        $penduduk = Penduduk::find($id);
+        if (!$penduduk) {
+            return response()->json(['status' => 'error', 'message' => 'Data penduduk tidak ditemukan'], 404);
+        }
+
+        // Cari user yang emailnya = NIK penduduk ini
+        $user = User::where('email', $penduduk->nik)->first();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Warga ini belum memiliki akun yang terdaftar'], 404);
+        }
+
+        // Default password format for reset (e.g., Budur[NIK_akhir]) atau static `DesaBudur123!`
+        $newPassword = 'DesaBudur123!';
+        
+        $user->update([
+            'password' => Hash::make($newPassword)
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password berhasil direset menjadi: ' . $newPassword,
+            'data' => [
+                'new_password' => $newPassword
+            ]
+        ]);
     }
 }

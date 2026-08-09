@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
-import { Users, Search, Edit, Trash2, Plus, Save, Upload, Download, FileSpreadsheet } from "lucide-react";
+import { Users, Search, Edit, Trash2, Plus, Save, Upload, Download, FileSpreadsheet, Key } from "lucide-react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
@@ -102,6 +102,28 @@ export default function AdminPenduduk() {
           fetchPenduduk();
         } catch (err) {
           toast.error("Gagal menghapus data penduduk");
+        }
+      }
+    });
+  };
+
+  const handleResetPassword = (id: number) => {
+    Swal.fire({
+      title: 'Reset Password?',
+      text: "Password akun yang tertaut dengan NIK ini akan dikembalikan ke default (DesaBudur123!). Lanjutkan?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Ya, Reset',
+      cancelButtonText: 'Batal'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await api.post(`/penduduk/${id}/reset-password`);
+          Swal.fire('Berhasil!', res.data.message, 'success');
+        } catch (err: any) {
+          toast.error(err.response?.data?.message || "Gagal mereset password");
         }
       }
     });
@@ -277,6 +299,13 @@ export default function AdminPenduduk() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
+                      <button 
+                        onClick={() => handleResetPassword(p.id)}
+                        className="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors" 
+                        title="Reset Password Akun"
+                      >
+                        <Key size={16} />
+                      </button>
                       <button 
                         onClick={() => handleOpenModal("edit", p)}
                         className="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" 
