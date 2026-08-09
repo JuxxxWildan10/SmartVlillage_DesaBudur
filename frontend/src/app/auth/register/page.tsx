@@ -19,20 +19,25 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      // Ambil CSRF Cookie terlebih dahulu (Sanctum SPA Auth)
-      await api.get("/sanctum/csrf-cookie");
-
       const res = await api.post("/register", formData);
       const data = res.data.data;
-      
-      // Token dikelola via HttpOnly Cookie
+
+      // Simpan token Bearer ke localStorage (sama seperti flow login)
+      localStorage.setItem("auth_token", data.token);
       localStorage.setItem("user_role", data.role);
       localStorage.setItem("user_name", data.user?.name || formData.name);
       localStorage.setItem("user_nik", formData.nik);
-      
+
       router.push("/warga");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Gagal melakukan registrasi");
+      const errData = err.response?.data;
+      // Tampilkan error validasi spesifik jika ada
+      if (errData?.errors) {
+        const firstError = Object.values(errData.errors)[0] as string[];
+        setError(firstError[0]);
+      } else {
+        setError(errData?.message || "Gagal melakukan registrasi. Periksa kembali data Anda.");
+      }
     } finally {
       setLoading(false);
     }
