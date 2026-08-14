@@ -12,6 +12,7 @@ export default function ArtikelDetailPage() {
   const [artikel, setArtikel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -23,7 +24,13 @@ export default function ArtikelDetailPage() {
           setNotFound(true);
         }
       })
-      .catch(() => setNotFound(true))
+      .catch((err) => {
+        if (err.response && err.response.status === 404) {
+          setNotFound(true);
+        } else {
+          setError(true);
+        }
+      })
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -44,9 +51,21 @@ export default function ArtikelDetailPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
+        <p className="text-2xl font-bold text-gray-700 mb-2">Gagal Memuat Artikel</p>
+        <p className="text-gray-500 mb-6">Silakan periksa koneksi internet Anda dan coba lagi.</p>
+        <button onClick={() => window.location.reload()} className="px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-primary-dark transition-colors">
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
+
   if (notFound || !artikel) {
     return (
-      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
         <p className="text-2xl font-bold text-gray-700 mb-4">Artikel tidak ditemukan</p>
         <button onClick={() => router.push("/artikel")} className="text-primary font-medium hover:underline">
           ← Kembali ke daftar artikel

@@ -3,8 +3,8 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import ChatbotWidget from "../shared/ChatbotWidget";
 import PanicButton from "../shared/PanicButton";
+import BackToTop from "../shared/BackToTop";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,8 +23,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         {children}
       </main>
       <Footer />
-      <ChatbotWidget />
       <PanicButton />
+      <BackToTop />
     </>
   );
 }

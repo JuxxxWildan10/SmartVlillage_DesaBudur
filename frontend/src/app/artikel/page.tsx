@@ -17,6 +17,7 @@ const KATEGORI_COLORS: Record<string, string> = {
 export default function ArtikelPage() {
   const [artikel, setArtikel] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
   const [activeKategori, setActiveKategori] = useState("Semua");
 
@@ -28,7 +29,10 @@ export default function ArtikelPage() {
           setArtikel(published);
         }
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error(err);
+        setError(true);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -74,8 +78,16 @@ export default function ArtikelPage() {
         {loading ? (
           <div className="grid md:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-white h-80 rounded-3xl border border-gray-100 animate-pulse" />
+              <div key={i} className="bg-white h-[400px] rounded-3xl border border-gray-100 animate-pulse" />
             ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <BookOpen size={48} className="mx-auto text-red-300 mb-4" />
+            <p className="text-gray-500 text-lg mb-4">Gagal memuat artikel. Silakan periksa koneksi Anda.</p>
+            <button onClick={() => window.location.reload()} className="px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-primary-dark transition-colors">
+              Coba Lagi
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">

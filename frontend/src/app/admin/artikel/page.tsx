@@ -119,7 +119,7 @@ export default function AdminArtikel() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse hidden md:table">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-500 uppercase tracking-wider">
                 <th className="px-6 py-4">Judul Artikel</th>
@@ -176,6 +176,51 @@ export default function AdminArtikel() {
               )}
             </tbody>
           </table>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {loading ? (
+              <div className="p-4"><SkeletonTable rows={3} /></div>
+            ) : filteredData.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <BookOpen size={36} className="mx-auto text-gray-300 mb-3" />
+                Belum ada artikel. Klik tombol "Tulis Artikel" untuk memulai.
+              </div>
+            ) : (
+              filteredData.map((a) => (
+                <div key={a.id} className="p-4 bg-white hover:bg-gray-50 transition-colors space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${a.status === "Published" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
+                      {a.status}
+                    </span>
+                    <div className="flex space-x-2">
+                      <button onClick={() => handleOpenModal("edit", a)} className="p-2 bg-amber-50 text-amber-600 rounded-lg transition-colors" title="Edit">
+                        <Edit size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(a.id)} className="p-2 bg-red-50 text-red-600 rounded-lg transition-colors" title="Hapus">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    {a.gambar_url ? (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                        <img src={a.gambar_url.startsWith("http") ? a.gambar_url : `${process.env.NEXT_PUBLIC_BASE_URL}${a.gambar_url}`} alt={a.judul} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-400 shrink-0">
+                        <BookOpen size={24} />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-bold text-gray-900 line-clamp-2 leading-snug mb-1">{a.judul}</h3>
+                      <p className="text-sm text-gray-500">{a.kategori} · {new Date(a.created_at).toLocaleDateString("id-ID")}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
@@ -213,7 +258,15 @@ export default function AdminArtikel() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Foto / Ilustrasi</label>
-            <input type="file" accept="image/*" onChange={(e) => setFormData({ ...formData, gambar_url: e.target.files ? e.target.files[0] : null })}
+            <input type="file" accept="image/*" onChange={(e) => {
+              const file = e.target.files ? e.target.files[0] : null;
+              if (file && file.size > 2 * 1024 * 1024) {
+                toast.error("Ukuran gambar maksimal 2MB!");
+                e.target.value = "";
+                return;
+              }
+              setFormData({ ...formData, gambar_url: file });
+            }}
               className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer outline-none transition-colors" />
           </div>
           <div>

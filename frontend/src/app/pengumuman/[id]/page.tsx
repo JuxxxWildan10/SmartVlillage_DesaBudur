@@ -12,6 +12,7 @@ export default function BeritaDetailPage() {
   const [berita, setBerita] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -23,7 +24,13 @@ export default function BeritaDetailPage() {
           setNotFound(true);
         }
       })
-      .catch(() => setNotFound(true))
+      .catch((err) => {
+        if (err.response && err.response.status === 404) {
+          setNotFound(true);
+        } else {
+          setError(true);
+        }
+      })
       .finally(() => setLoading(false));
   }, [params.id]);
 
@@ -48,9 +55,21 @@ export default function BeritaDetailPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
+        <p className="text-2xl font-bold text-gray-700 mb-2">Gagal Memuat Berita</p>
+        <p className="text-gray-500 mb-6">Silakan periksa koneksi internet Anda dan coba lagi.</p>
+        <button onClick={() => window.location.reload()} className="px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-primary-dark transition-colors">
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
+
   if (notFound || !berita) {
     return (
-      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+      <div className="pt-24 pb-16 min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
         <p className="text-2xl font-bold text-gray-700 mb-4">Berita tidak ditemukan</p>
         <button onClick={() => router.push("/pengumuman")} className="text-primary font-medium hover:underline">
           ← Kembali ke daftar berita
@@ -76,7 +95,7 @@ export default function BeritaDetailPage() {
           {/* Cover Image */}
           <div className="relative h-72 md:h-96 w-full">
             <Image
-              src={berita.gambar_url || "https://images.unsplash.com/photo-1592982537447-6f2334208f74?q=80&w=2070&auto=format&fit=crop"}
+              src={berita.gambar_url ? (berita.gambar_url.startsWith("http") ? berita.gambar_url : `${process.env.NEXT_PUBLIC_BASE_URL}${berita.gambar_url}`) : "https://images.unsplash.com/photo-1592982537447-6f2334208f74?q=80&w=2070&auto=format&fit=crop"}
               alt={berita.judul}
               fill
               className="object-cover"

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-@import "tailwindcss";
+html {
+  scroll-behavior: smooth;
+}
 
 :root {
   --background: #ffffff;
@@ -34,8 +36,8 @@
   --color-blue: var(--blue);
   --color-blue-light: var(--blue-light);
 
-  --font-sans: var(--font-inter), sans-serif;
-  --font-heading: var(--font-poppins), sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Poppins", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -68,20 +70,78 @@
   }
 }
 
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
 @keyframes ticker {
-  0% {
-    transform: translateX(100vw);
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
   }
-  100% {
-    transform: translateX(-100%);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(27, 94, 32, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(27, 94, 32, 0);
+  }
+}
+
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes scroll-indicator {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(12px); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
 
 @utility glass {
   background: var(--glass-bg);
@@ -96,10 +156,55 @@ body {
   justify-content: center;
 }
 
+@utility skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@utility animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@utility animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@utility animate-badge-pulse {
+  animation: badge-pulse 1.5s ease-in-out infinite;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
 /* Fix input text color blending with background in dark mode */
 input, select, textarea {
   color: #111827 !important;
   background-color: #ffffff !important;
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR — Global (Light)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Custom Scrollbar for Sidebar (Dark Theme) */
@@ -117,3 +222,17 @@ input, select, textarea {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* ============================================
+   TYPING INDICATOR (Chatbot)
+   ============================================ */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #94a3b8;
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, Phone, X, ShieldAlert, Ambulance, Flame } from "lucide-react";
+import { AlertCircle, Phone, X, ShieldAlert, Ambulance, Flame, MessageSquare, Sparkles } from "lucide-react";
+import ChatbotWidget from "./ChatbotWidget";
 
 export default function PanicButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const emergencyContacts = [
     { name: "Ambulans Desa", number: "0812-3456-7890", icon: Ambulance, color: "text-blue-500", bg: "bg-blue-100" },
@@ -14,14 +16,16 @@ export default function PanicButton() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Floating Button */}
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110 
-          ${isOpen ? 'bg-gray-800 text-white rotate-90' : 'bg-red-600 text-white animate-pulse'}`}
-      >
-        {isOpen ? <X size={28} /> : <AlertCircle size={32} />}
-      </button>
+      {/* Floating Button - Hides if chat is open */}
+      {!isChatOpen && (
+        <button 
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110 
+            ${isOpen ? 'bg-gray-800 text-white rotate-90' : 'bg-red-600 text-white animate-pulse'}`}
+        >
+          {isOpen ? <X size={28} /> : <AlertCircle size={32} />}
+        </button>
+      )}
 
       {/* Popup Menu */}
       <div 
@@ -39,6 +43,24 @@ export default function PanicButton() {
         </div>
 
         <div className="space-y-3">
+          <button 
+            onClick={() => { setIsChatOpen(true); setIsOpen(false); }}
+            className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
+                <MessageSquare size={20} />
+              </div>
+              <div className="text-left">
+                <h4 className="font-bold text-sm text-gray-900">Asisten Pintar Desa</h4>
+                <p className="text-xs text-gray-500">Tanya seputar layanan (AI)</p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Sparkles size={14} />
+            </div>
+          </button>
+
           {emergencyContacts.map((contact, idx) => (
             <a 
               key={idx}
@@ -61,6 +83,8 @@ export default function PanicButton() {
           ))}
         </div>
       </div>
+
+      <ChatbotWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
